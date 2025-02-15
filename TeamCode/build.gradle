@@ -22,7 +22,14 @@ android {
         jniLibs.useLegacyPackaging true
     }
 }
-
+repositories {
+    maven {
+        url = 'https://maven.brott.dev/'
+    }
+}
 dependencies {
     implementation project(':FtcRobotController')
+
+    implementation 'com.github.GramGra07:GentrifiedAppsUtil:2.0.3-dev'
+    implementation 'com.github.GramGra07:VelocityVision:1.1.2'
 }

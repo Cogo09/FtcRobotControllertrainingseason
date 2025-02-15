@@ -30,6 +30,8 @@ repositories {
 dependencies {
     implementation project(':FtcRobotController')
 
+    implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
+
     implementation 'com.github.GramGra07:GentrifiedAppsUtil:2.0.3-dev2'
     implementation 'com.github.GramGra07:VelocityVision:1.1.2'
 }

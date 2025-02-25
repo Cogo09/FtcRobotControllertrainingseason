@@ -22,6 +22,7 @@ import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.Encoder;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generators.EncoderSpecsBuilder;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.EncoderSpecs;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.EncoderStorage;
+import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.PIDController;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.Angle;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.AngleUnit;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.Heatseeker;
@@ -30,8 +31,8 @@ import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.IMUP
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.TwoWheelLocalizer;
 import org.gentrifiedApps.gentrifiedAppsUtil.idler.Idler;
 import org.gentrifiedApps.gentrifiedAppsUtil.initMovement.InitMovementController;
-import org.gentrifiedApps.gentrifiedAppsUtil.looptime.LoopTimeController;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver.Companion.*;
+import org.gentrifiedApps.gentrifiedAppsUtil.looptime.LoopTimeController;
 
 @TeleOp
 public class GentrifiedAppsTestOpMode extends LinearOpMode {
@@ -54,7 +55,7 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
             new IMUParams("imu", new IMU.Parameters(orientationOnRobot))
     );
     Driver driver = new Driver(this,"fl","fr","bl","br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD,localizer);
-    Heatseeker heatseeker = new Heatseeker(driver);
+    Heatseeker heatseeker = new Heatseeker(driver, new PIDController(1.0,0.0,0.0), new PIDController(1.0,0.0,0.0), new PIDController(1.0,0.0,0.0));
     TeleOpCorrector teleOpCorrector = heatseeker.teleOpCorrector();
 
     @Override

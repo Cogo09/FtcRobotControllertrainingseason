@@ -14,7 +14,18 @@
 // Include common definitions from above.
 apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
-
+apply plugin: 'dev.frozenmilk.sinister.sloth.Load'
+buildscript {
+    repositories {
+        mavenCentral()
+        maven {
+            url "https://repo.dairy.foundation/snapshots"
+        }
+    }
+    dependencies {
+        classpath "dev.frozenmilk.sinister.sloth:Load:0.0.1"
+    }
+}
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
 

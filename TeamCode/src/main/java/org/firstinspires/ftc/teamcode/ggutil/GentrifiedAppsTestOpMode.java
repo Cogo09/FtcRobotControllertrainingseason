@@ -28,11 +28,14 @@ import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.An
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.Heatseeker;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.Target2D;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.IMUParams;
+import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.MecanumLocalizer;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.TwoWheelLocalizer;
 import org.gentrifiedApps.gentrifiedAppsUtil.idler.Idler;
 import org.gentrifiedApps.gentrifiedAppsUtil.initMovement.InitMovementController;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver.Companion.*;
 import org.gentrifiedApps.gentrifiedAppsUtil.looptime.LoopTimeController;
+
+import java.lang.annotation.Target;
 
 @TeleOp
 public class GentrifiedAppsTestOpMode extends LinearOpMode {
@@ -47,14 +50,19 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
     RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
     RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
-    TwoWheelLocalizer localizer = new TwoWheelLocalizer(
-            hardwareMap,
-            new Target2D(0,0,new Angle(0,AngleUnit.RADIANS)),
-            new EncoderStorage(new Encoder(EncoderSpecsBuilder.INSTANCE.goBildaSwingArm(), "fl", DcMotorSimple.Direction.FORWARD,0.0,hardwareMap),null
-            ,new Encoder(EncoderSpecsBuilder.INSTANCE.goBildaSwingArm(), "fr", DcMotorSimple.Direction.FORWARD,0.0,hardwareMap)),
-            new IMUParams("imu", new IMU.Parameters(orientationOnRobot))
-    );
-    Driver driver = new Driver(this,"fl","fr","bl","br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD,localizer);
+//    TwoWheelLocalizer localizer = new TwoWheelLocalizer(
+//            hardwareMap,
+//            new Target2D(0,0,new Angle(0,AngleUnit.RADIANS)),
+//            new EncoderStorage(new Encoder(EncoderSpecsBuilder.INSTANCE.goBildaSwingArm(), "fl", DcMotorSimple.Direction.FORWARD,0.0,hardwareMap),null
+//            ,new Encoder(EncoderSpecsBuilder.INSTANCE.goBildaSwingArm(), "fr", DcMotorSimple.Direction.FORWARD,0.0,hardwareMap)),
+//            new IMUParams("imu", new IMU.Parameters(orientationOnRobot))
+//    );
+    Driver driver = new Driver(this,"fl","fr","bl","br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD);
+
+    MecanumLocalizer localizer = new MecanumLocalizer(
+            driver,0.008,
+            16);
+
     Heatseeker heatseeker = new Heatseeker(driver, new PIDController(1.0,0.0,0.0), new PIDController(1.0,0.0,0.0), new PIDController(1.0,0.0,0.0));
     TeleOpCorrector teleOpCorrector = heatseeker.teleOpCorrector();
 
@@ -63,6 +71,8 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         driver.update();
+
+        driver.setLocalizer(localizer);
 
         waitForStart();
         while (opModeIsActive()) {

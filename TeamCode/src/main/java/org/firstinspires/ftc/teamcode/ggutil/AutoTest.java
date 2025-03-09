@@ -18,7 +18,9 @@ import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.An
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.Target2D;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.Waypoint;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.IMUParams;
+import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.MecanumLocalizer;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.TwoWheelLocalizer;
+import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.path.Path;
 
 import java.util.List;
 
@@ -29,23 +31,28 @@ public class AutoTest extends LinearOpMode {
     @Override
     public void runOpMode() {
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
-        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.BACKWARD;
 
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
-        TwoWheelLocalizer localizer = new TwoWheelLocalizer(
-                hardwareMap,
-                new Target2D(0, 0, new Angle(0, AngleUnit.RADIANS)),
-                new EncoderStorage(new Encoder(EncoderSpecsBuilder.INSTANCE.goBildaSwingArm(), "fl", DcMotorSimple.Direction.FORWARD, 0.0, hardwareMap), null
-                        , new Encoder(EncoderSpecsBuilder.INSTANCE.goBildaSwingArm(), "fr", DcMotorSimple.Direction.FORWARD, 0.0, hardwareMap)),
-                new IMUParams("imu", new IMU.Parameters(orientationOnRobot))
-        );
-        Driver driver = new Driver(this, "fl", "fr", "bl", "br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD, localizer);
+//        TwoWheelLocalizer localizer = new TwoWheelLocalizer(
+//                hardwareMap,
+//                new Target2D(0, 0, new Angle(0, AngleUnit.RADIANS)),
+//                new EncoderStorage(new Encoder(EncoderSpecsBuilder.INSTANCE.goBildaSwingArm(), "fl", DcMotorSimple.Direction.FORWARD, 0.0, hardwareMap), null
+//                        , new Encoder(EncoderSpecsBuilder.INSTANCE.goBildaSwingArm(), "fr", DcMotorSimple.Direction.FORWARD, 0.0, hardwareMap)),
+//                new IMUParams("imu", new IMU.Parameters(orientationOnRobot))
+//        );
+        Driver driver = new Driver(this, "fl", "fr", "bl", "br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD);
+
+        MecanumLocalizer localizer = new MecanumLocalizer(
+                driver,0.008,
+                16);
+
+        driver.setLocalizer(localizer);
         Heatseeker heatseeker = new Heatseeker(driver,new PIDController(1.0,0.0,0.0),new PIDController(1.0,0.0,0.0),new PIDController(1.0,0.0,0.0));
-        List<Waypoint> waypoints = new PathBuilder()
+        List<Path> waypoints = new PathBuilder()
                 .addWaypoint(new Waypoint(new Target2D(0, 10.0, new Angle(0, AngleUnit.RADIANS)), 0.5))
                 .build();
-
         waitForStart();
         if (opModeIsActive()) {
             heatseeker.followPath(waypoints, 1);

@@ -108,6 +108,9 @@ android {
 
     packagingOptions {
         pickFirst '**/*.so'
+
+        exclude 'META-INF/LICENSE-notice.md'
+        exclude 'META-INF/LICENSE.md'
     }
     ndkVersion '21.3.6528147'
 }

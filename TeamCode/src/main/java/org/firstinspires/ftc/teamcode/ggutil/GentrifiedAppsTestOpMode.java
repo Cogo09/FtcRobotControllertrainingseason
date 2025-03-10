@@ -15,6 +15,9 @@ import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.gamepad.GamepadPlus;
 import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.servo.ServoPlus;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.Scribe;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.Timeout;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.AnalogEncoder;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.Operand;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.Operation;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.DrivePowerCoefficients;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.MecanumDriver;
@@ -36,8 +39,12 @@ import org.gentrifiedApps.gentrifiedAppsUtil.idler.Idler;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver.Companion.*;
 import org.gentrifiedApps.gentrifiedAppsUtil.initMovement.InitMovementController;
 import org.gentrifiedApps.gentrifiedAppsUtil.looptime.LoopTimeController;
+import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.Sensor;
+import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.SensorArray;
+import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.SensorType;
 
 import java.lang.annotation.Target;
+import java.util.List;
 
 @TeleOp
 public class GentrifiedAppsTestOpMode extends LinearOpMode {
@@ -49,8 +56,8 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         GamepadPlus gamepadPlus1 = new GamepadPlus(gamepad1, false);
         GamepadPlus gamepadPlus2 = new GamepadPlus(gamepad2, false);
 //        InitMovementController initMovementController = new InitMovementController(gamepadPlus1, gamepadPlus2);
-        InitMovementController initMovementController = new InitMovementController(gamepad1, gamepad2);
-        ServoPlus servoPlus = new ServoPlus(this.hardwareMap, "servo", 360);
+//        InitMovementController initMovementController = new InitMovementController(gamepad1, gamepad2);
+        ServoPlus servoPlus = new ServoPlus(this.hardwareMap, "servo");
         Idler idler = new Idler(this);
 //        VoltageTracker voltageTracker = new VoltageTracker(this.hardwareMap);
 
@@ -74,6 +81,12 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         Heatseeker heatseeker = new Heatseeker(driver, new PIDController(1.0,0.0,0.0), new PIDController(1.0,0.0,0.0), new PIDController(1.0,0.0,0.0));
 //        TeleOpCorrector teleOpCorrector = heatseeker.teleOpCorrector();
 
+        AnalogEncoder aEncoder = new AnalogEncoder(hardwareMap,"potent", 0.0,List.of(new Operation(Operand.MULTIPLY,81.8)));
+
+        SensorArray sensorArray = new SensorArray(hardwareMap);
+        sensorArray.addSensor(new Sensor("touch", SensorType.TOUCH,1));
+        sensorArray.addSensor(new Sensor(aEncoder,1));
+
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         driver.update();
@@ -84,24 +97,27 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         Timeout timeout = new Timeout(5,()->{return gamepadPlus1.buttonJustReleased(Button.DPAD_DOWN);});
         timeout.start();
         while (opModeIsActive()) {
+            telemetry.addData("aEncoder",aEncoder.getCurrentPosition());
+            sensorArray.autoLoop(loopTimeController.getLoops());
+            sensorArray.allTelemetry(telemetry);
             timeout.update();
             telemetry.addData("timeout",timeout.isTimedOut());
 //            voltageTracker.update();
 //            voltageTracker.telemetry(telemetry);
-            initMovementController.checkHasMovedOnInit();
+//            initMovementController.checkHasMovedOnInit();
 
-            if (initMovementController.hasMovedOnInit()) {
-                servoPlus.setPosition(90);
-            }
+//            if (initMovementController.hasMovedOnInit()) {
+//                servoPlus.setPosition(180);
+//            }
 
-            if (initMovementController.hasMovedOnInit()) {
-                if (gamepadPlus1.buttonJustReleased(Button.CROSS)) {
+//            if (initMovementController.hasMovedOnInit()) {
+                if (gamepadPlus1.buttonJustReleased(Button.A)) {
                     idler.safeIdle(5, () -> {
                         telemetry.addData("idler", "idling");
                         telemetry.update();
                     });
                 }
-            }
+//            }
             DrivePowerCoefficients powerCoefficients = MecanumDriver.driveMecanum(gamepadPlus1.readFloat(FloatButton.LEFT_X),gamepadPlus1.readFloat(FloatButton.LEFT_Y),gamepadPlus1.readFloat(FloatButton.RIGHT_X));
 
 //            if (!powerCoefficients.notZero()){
@@ -117,9 +133,10 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
             gamepadPlus1.sync();
             gamepadPlus2.sync();
 
-            telemetry.addData("hasMovedOnInit", initMovementController.hasMovedOnInit());
+//            telemetry.addData("hasMovedOnInit", initMovementController.hasMovedOnInit());
             loopTimeController.telemetry(telemetry);
             driver.update();
+            telemetry.update();
         }
     }
 

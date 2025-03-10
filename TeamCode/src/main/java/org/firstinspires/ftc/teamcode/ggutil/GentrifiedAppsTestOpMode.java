@@ -13,6 +13,8 @@ import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.gamepad.Button;
 import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.gamepad.FloatButton;
 import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.gamepad.GamepadPlus;
 import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.servo.ServoPlus;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.Scribe;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.Timeout;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.DrivePowerCoefficients;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.MecanumDriver;
@@ -31,24 +33,30 @@ import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.IMUP
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.MecanumLocalizer;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.TwoWheelLocalizer;
 import org.gentrifiedApps.gentrifiedAppsUtil.idler.Idler;
-import org.gentrifiedApps.gentrifiedAppsUtil.initMovement.InitMovementController;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver.Companion.*;
+import org.gentrifiedApps.gentrifiedAppsUtil.initMovement.InitMovementController;
 import org.gentrifiedApps.gentrifiedAppsUtil.looptime.LoopTimeController;
 
 import java.lang.annotation.Target;
 
 @TeleOp
 public class GentrifiedAppsTestOpMode extends LinearOpMode {
-    LoopTimeController loopTimeController = new LoopTimeController();
-    GamepadPlus gamepadPlus1 = new GamepadPlus(gamepad1, false);
-    GamepadPlus gamepadPlus2 = new GamepadPlus(gamepad2, false);
-    InitMovementController initMovementController = new InitMovementController(gamepadPlus1, gamepadPlus2);
-    ServoPlus servoPlus = new ServoPlus(this.hardwareMap, "servo", 360);
-    Idler idler = new Idler();
 
-    RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
-    RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
-    RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
+
+    @Override
+    public void runOpMode() throws InterruptedException {
+        LoopTimeController loopTimeController = new LoopTimeController();
+        GamepadPlus gamepadPlus1 = new GamepadPlus(gamepad1, false);
+        GamepadPlus gamepadPlus2 = new GamepadPlus(gamepad2, false);
+//        InitMovementController initMovementController = new InitMovementController(gamepadPlus1, gamepadPlus2);
+        InitMovementController initMovementController = new InitMovementController(gamepad1, gamepad2);
+        ServoPlus servoPlus = new ServoPlus(this.hardwareMap, "servo", 360);
+        Idler idler = new Idler(this);
+//        VoltageTracker voltageTracker = new VoltageTracker(this.hardwareMap);
+
+        RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
+        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+        RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
 //    TwoWheelLocalizer localizer = new TwoWheelLocalizer(
 //            hardwareMap,
@@ -57,25 +65,29 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //            ,new Encoder(EncoderSpecsBuilder.INSTANCE.goBildaSwingArm(), "fr", DcMotorSimple.Direction.FORWARD,0.0,hardwareMap)),
 //            new IMUParams("imu", new IMU.Parameters(orientationOnRobot))
 //    );
-    Driver driver = new Driver(this,"fl","fr","bl","br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD);
+        Driver driver = new Driver(this,"fl","fr","bl","br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE);
 
-    MecanumLocalizer localizer = new MecanumLocalizer(
-            driver,0.008,
-            16);
+        MecanumLocalizer localizer = new MecanumLocalizer(
+                driver,0.008,
+                16);
 
-    Heatseeker heatseeker = new Heatseeker(driver, new PIDController(1.0,0.0,0.0), new PIDController(1.0,0.0,0.0), new PIDController(1.0,0.0,0.0));
-    TeleOpCorrector teleOpCorrector = heatseeker.teleOpCorrector();
+        Heatseeker heatseeker = new Heatseeker(driver, new PIDController(1.0,0.0,0.0), new PIDController(1.0,0.0,0.0), new PIDController(1.0,0.0,0.0));
+//        TeleOpCorrector teleOpCorrector = heatseeker.teleOpCorrector();
 
-    @Override
-    public void runOpMode() throws InterruptedException {
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         driver.update();
 
         driver.setLocalizer(localizer);
-
+        Scribe.getInstance().startLogger("CoolTag");
         waitForStart();
+        Timeout timeout = new Timeout(5,()->{return gamepadPlus1.buttonJustReleased(Button.DPAD_DOWN);});
+        timeout.start();
         while (opModeIsActive()) {
+            timeout.update();
+            telemetry.addData("timeout",timeout.isTimedOut());
+//            voltageTracker.update();
+//            voltageTracker.telemetry(telemetry);
             initMovementController.checkHasMovedOnInit();
 
             if (initMovementController.hasMovedOnInit()) {
@@ -83,7 +95,7 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
             }
 
             if (initMovementController.hasMovedOnInit()) {
-                if (gamepadPlus1.buttonJustPressed(Button.CIRCLE)) {
+                if (gamepadPlus1.buttonJustReleased(Button.CROSS)) {
                     idler.safeIdle(5, () -> {
                         telemetry.addData("idler", "idling");
                         telemetry.update();
@@ -92,12 +104,12 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
             }
             DrivePowerCoefficients powerCoefficients = MecanumDriver.driveMecanum(gamepadPlus1.readFloat(FloatButton.LEFT_X),gamepadPlus1.readFloat(FloatButton.LEFT_Y),gamepadPlus1.readFloat(FloatButton.RIGHT_X));
 
-            if (!powerCoefficients.notZero()){
-                // has no powers to move
-                teleOpCorrector.updateOrientation();
-            }else if (gamepadPlus1.readFloat(FloatButton.RIGHT_X) == 0.0){
-                powerCoefficients = teleOpCorrector.correctByAngle(powerCoefficients);
-            }
+//            if (!powerCoefficients.notZero()){
+//                // has no powers to move
+//                teleOpCorrector.updateOrientation();
+//            }else if (gamepadPlus1.readFloat(FloatButton.RIGHT_X) == 0.0){
+//                powerCoefficients = teleOpCorrector.correctByAngle(powerCoefficients);
+//            }
 
             driver.setWheelPower(powerCoefficients);
 
@@ -105,10 +117,9 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
             gamepadPlus1.sync();
             gamepadPlus2.sync();
 
+            telemetry.addData("hasMovedOnInit", initMovementController.hasMovedOnInit());
             loopTimeController.telemetry(telemetry);
             driver.update();
-
-            telemetry.update();
         }
     }
 

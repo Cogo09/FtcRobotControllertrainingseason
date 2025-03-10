@@ -15,6 +15,7 @@
 apply from: '../build.common.gradle'
 apply from: '../build.dependencies.gradle'
 apply plugin: 'dev.frozenmilk.sinister.sloth.Load'
+apply plugin: 'org.jetbrains.kotlin.android'
 buildscript {
     repositories {
         mavenCentral()
@@ -28,8 +29,11 @@ buildscript {
 }
 android {
     namespace = 'org.firstinspires.ftc.teamcode'
+    compileSdk 35
 
-    compileSdkVersion 34
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
     packagingOptions {
         jniLibs.useLegacyPackaging true
     }
@@ -45,10 +49,11 @@ dependencies {
     implementation project(':FtcRobotController')
 
 //    implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
-    implementation "com.acmerobotics.slothboard:dashboard:0.1.0+0.4.16"
+    implementation "com.acmerobotics.slothboard:dashboard:0.1.1+0.4.16"
 
-    implementation 'com.github.GramGra07:GentrifiedAppsUtil:2.0.3-dev8'
+    implementation 'com.github.GramGra07:GentrifiedAppsUtil:2.0.3-dev9'
     implementation 'com.github.GramGra07:VelocityVision:1.1.2'
 
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
+    implementation 'androidx.core:core-ktx:1.15.0'
 }

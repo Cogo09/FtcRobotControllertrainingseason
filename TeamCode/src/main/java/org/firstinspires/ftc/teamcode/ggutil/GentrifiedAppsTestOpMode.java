@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.ggutil;
 
 
+import com.qualcomm.hardware.bosch.BNO055IMU;
+import com.qualcomm.hardware.lynx.LynxEmbeddedBNO055IMUNew;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -33,7 +35,6 @@ import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.An
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.Heatseeker;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.Target2D;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.IMUParams;
-import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.MecanumLocalizer;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.TwoWheelLocalizer;
 import org.gentrifiedApps.gentrifiedAppsUtil.idler.Idler;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver.Companion.*;
@@ -74,12 +75,8 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //    );
         Driver driver = new Driver(this,"fl","fr","bl","br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE);
 
-        MecanumLocalizer localizer = new MecanumLocalizer(
-                driver,0.008,
-                16);
-
-        Heatseeker heatseeker = new Heatseeker(driver, new PIDController(1.0,0.0,0.0), new PIDController(1.0,0.0,0.0), new PIDController(1.0,0.0,0.0));
-//        TeleOpCorrector teleOpCorrector = heatseeker.teleOpCorrector();
+        IMU imu = hardwareMap.get(IMU.class, "imu");
+        imu.initialize(new IMU.Parameters(orientationOnRobot));
 
         AnalogEncoder aEncoder = new AnalogEncoder(hardwareMap,"potent", 0.0,List.of(new Operation(Operand.MULTIPLY,81.8)));
 
@@ -91,7 +88,6 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         telemetry.update();
         driver.update();
 
-        driver.setLocalizer(localizer);
         Scribe.getInstance().startLogger("CoolTag");
         waitForStart();
         Timeout timeout = new Timeout(5,()->{return gamepadPlus1.buttonJustReleased(Button.DPAD_DOWN);});
@@ -118,6 +114,9 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
                     });
                 }
 //            }
+
+            telemetry.addData("imu",imu.getRobotYawPitchRollAngles().getYaw());
+//            DrivePowerCoefficients powerCoefficients = FieldCentricDriver.driveFieldCentric(gamepadPlus1.readFloat(FloatButton.LEFT_X),gamepadPlus1.readFloat(FloatButton.LEFT_Y),gamepadPlus1.readFloat(FloatButton.RIGHT_X),imu.getRobotYawPitchRollAngles().getYaw());
             DrivePowerCoefficients powerCoefficients = MecanumDriver.driveMecanum(gamepadPlus1.readFloat(FloatButton.LEFT_X),gamepadPlus1.readFloat(FloatButton.LEFT_Y),gamepadPlus1.readFloat(FloatButton.RIGHT_X));
 
 //            if (!powerCoefficients.notZero()){

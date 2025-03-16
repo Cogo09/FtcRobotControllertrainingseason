@@ -51,7 +51,7 @@ dependencies {
 //    implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
     implementation "com.acmerobotics.slothboard:dashboard:0.1.1+0.4.16"
 
-    implementation 'com.github.GramGra07:GentrifiedAppsUtil:2.0.3-dev9.2.1'
+    implementation 'com.github.GramGra07:GentrifiedAppsUtil:2.0.3-dev10.0.1'
     implementation 'com.github.GramGra07:VelocityVision:1.1.2'
 
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'

@@ -1,15 +1,11 @@
 package org.firstinspires.ftc.teamcode.ggutil;
 
 
-import com.qualcomm.hardware.bosch.BNO055IMU;
-import com.qualcomm.hardware.lynx.LynxEmbeddedBNO055IMUNew;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
-import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.ImuOrientationOnRobot;
 
 import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.gamepad.Button;
 import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.gamepad.FloatButton;
@@ -24,27 +20,15 @@ import org.gentrifiedApps.gentrifiedAppsUtil.drive.DrivePowerCoefficients;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.MecanumDriver;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.Driver;
-import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.TeleOpCorrector;
-import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.Encoder;
-import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generators.EncoderSpecsBuilder;
-import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.EncoderSpecs;
-import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.EncoderStorage;
-import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.PIDController;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.Angle;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.AngleUnit;
-import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.Heatseeker;
-import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.Target2D;
-import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.IMUParams;
-import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.TwoWheelLocalizer;
+import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.MecanumLocalizer;
 import org.gentrifiedApps.gentrifiedAppsUtil.idler.Idler;
-import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver.Companion.*;
-import org.gentrifiedApps.gentrifiedAppsUtil.initMovement.InitMovementController;
 import org.gentrifiedApps.gentrifiedAppsUtil.looptime.LoopTimeController;
 import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.Sensor;
 import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.SensorArray;
 import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.SensorType;
 
-import java.lang.annotation.Target;
 import java.util.List;
 
 @TeleOp
@@ -75,14 +59,15 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //    );
         Driver driver = new Driver(this,"fl","fr","bl","br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE);
 
+        MecanumLocalizer localizer = new MecanumLocalizer(driver,37.74,16);
+        driver.setLocalizer(localizer);
+
         IMU imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(new IMU.Parameters(orientationOnRobot));
 
         AnalogEncoder aEncoder = new AnalogEncoder(hardwareMap,"potent", 0.0,List.of(new Operation(Operand.MULTIPLY,81.8)));
 
-        SensorArray sensorArray = new SensorArray(hardwareMap);
-        sensorArray.addSensor(new Sensor("touch", SensorType.TOUCH,1));
-        sensorArray.addSensor(new Sensor(aEncoder,1));
+        SensorArray sensorArray = new SensorArray().addSensor(Sensor.touchSensor(hardwareMap,"touch")).addSensor(Sensor.analogEncoder(aEncoder));
 
         telemetry.addData("Status", "Initialized");
         telemetry.update();
@@ -116,8 +101,8 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //            }
 
             telemetry.addData("imu",imu.getRobotYawPitchRollAngles().getYaw());
-//            DrivePowerCoefficients powerCoefficients = FieldCentricDriver.driveFieldCentric(gamepadPlus1.readFloat(FloatButton.LEFT_X),gamepadPlus1.readFloat(FloatButton.LEFT_Y),gamepadPlus1.readFloat(FloatButton.RIGHT_X),imu.getRobotYawPitchRollAngles().getYaw());
-            DrivePowerCoefficients powerCoefficients = MecanumDriver.driveMecanum(gamepadPlus1.readFloat(FloatButton.LEFT_X),gamepadPlus1.readFloat(FloatButton.LEFT_Y),gamepadPlus1.readFloat(FloatButton.RIGHT_X));
+            DrivePowerCoefficients powerCoefficients = FieldCentricDriver.driveFieldCentric(gamepadPlus1.readFloat(FloatButton.LEFT_X),gamepadPlus1.readFloat(FloatButton.LEFT_Y),gamepadPlus1.readFloat(FloatButton.RIGHT_X), new Angle(imu.getRobotYawPitchRollAngles().getYaw(), AngleUnit.DEGREES));
+//            DrivePowerCoefficients powerCoefficients = MecanumDriver.driveMecanum(gamepadPlus1.readFloat(FloatButton.LEFT_X),gamepadPlus1.readFloat(FloatButton.LEFT_Y),gamepadPlus1.readFloat(FloatButton.RIGHT_X));
 
 //            if (!powerCoefficients.notZero()){
 //                // has no powers to move
@@ -125,7 +110,6 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //            }else if (gamepadPlus1.readFloat(FloatButton.RIGHT_X) == 0.0){
 //                powerCoefficients = teleOpCorrector.correctByAngle(powerCoefficients);
 //            }
-
             driver.setWheelPower(powerCoefficients);
 
             loopTimeController.update();

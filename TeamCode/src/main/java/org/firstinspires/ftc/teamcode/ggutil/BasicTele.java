@@ -21,7 +21,7 @@ public class BasicTele extends LinearOpMode {
         LoopTimeController loopTimeController = new LoopTimeController();
         GamepadPlus gamepadPlus1 = new GamepadPlus(gamepad1, false);
         GamepadPlus gamepadPlus2 = new GamepadPlus(gamepad2, false);
-        Driver driver = new Driver(this, "fl", "fr", "bl", "br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, null);
+        Driver driver = new Driver(this, "fl", "fr", "bl", "br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE);
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         driver.update();

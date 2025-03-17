@@ -45,11 +45,11 @@ public class AutoTest extends LinearOpMode {
         Driver driver = new Driver(this, "fl", "fr", "bl", "br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.FORWARD);
 
         MecanumLocalizer localizer = new MecanumLocalizer(
-                driver,0.008,
+                driver,37.4,
                 16);
 
         driver.setLocalizer(localizer);
-        Heatseeker heatseeker = new Heatseeker(driver,new PIDController(1.0,0.0,0.0),new PIDController(1.0,0.0,0.0),new PIDController(1.0,0.0,0.0));
+        Heatseeker heatseeker = new Heatseeker(driver,new PIDController(0.0001,0.0,0.0),new PIDController(0.0001,0.0,0.0),new PIDController(1.0,0.0,0.0));
         List<Path> waypoints = new PathBuilder()
                 .addWaypoint(new Waypoint(new Target2D(0, 10.0, new Angle(0, AngleUnit.RADIANS)), 0.5))
                 .build();

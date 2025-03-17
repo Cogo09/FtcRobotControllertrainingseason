@@ -1,5 +1,6 @@
 //! idk
 FieldCentricDriver - needs full inclusive test
-SensorArray - needs another test
-DriverAid
+DriverAid - need to create a test
 HeatSeeker
+
+once all but HS done, pub as latest release not dev

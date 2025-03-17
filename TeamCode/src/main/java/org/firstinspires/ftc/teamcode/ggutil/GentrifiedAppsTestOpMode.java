@@ -1,6 +1,8 @@
 package org.firstinspires.ftc.teamcode.ggutil;
 
 
+import android.util.Pair;
+
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
@@ -18,7 +20,6 @@ import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.Operand;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.Operation;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.DrivePowerCoefficients;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver;
-import org.gentrifiedApps.gentrifiedAppsUtil.drive.MecanumDriver;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.Driver;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.Angle;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.AngleUnit;
@@ -27,9 +28,16 @@ import org.gentrifiedApps.gentrifiedAppsUtil.idler.Idler;
 import org.gentrifiedApps.gentrifiedAppsUtil.looptime.LoopTimeController;
 import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.Sensor;
 import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.SensorArray;
-import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.SensorType;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
+
+enum SMD {
+    SLOW_MODE,
+    FAST_MODE,
+    SUPER_SLOW_MODE
+}
 
 @TeleOp
 public class GentrifiedAppsTestOpMode extends LinearOpMode {
@@ -47,7 +55,7 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //        VoltageTracker voltageTracker = new VoltageTracker(this.hardwareMap);
 
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
-        RevHubOrientationOnRobot.UsbFacingDirection  usbDirection  = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
+        RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
 
 //    TwoWheelLocalizer localizer = new TwoWheelLocalizer(
@@ -57,32 +65,49 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //            ,new Encoder(EncoderSpecsBuilder.INSTANCE.goBildaSwingArm(), "fr", DcMotorSimple.Direction.FORWARD,0.0,hardwareMap)),
 //            new IMUParams("imu", new IMU.Parameters(orientationOnRobot))
 //    );
-        Driver driver = new Driver(this,"fl","fr","bl","br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE);
+        Driver driver = new Driver(this, "fl", "fr", "bl", "br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE);
 
-        MecanumLocalizer localizer = new MecanumLocalizer(driver,37.74,16);
+        MecanumLocalizer localizer = new MecanumLocalizer(driver, 37.74, 16);
         driver.setLocalizer(localizer);
 
         IMU imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(new IMU.Parameters(orientationOnRobot));
+        imu.resetYaw();
 
-        AnalogEncoder aEncoder = new AnalogEncoder(hardwareMap,"potent", 0.0,List.of(new Operation(Operand.MULTIPLY,81.8)));
+//        SlowModeManager slowModeManager = new SlowModeManager(gamepadPlus1);// test with just 1 and default button
+        //new enum
 
-        SensorArray sensorArray = new SensorArray().addSensor(Sensor.touchSensor(hardwareMap,"touch")).addSensor(Sensor.analogEncoder(aEncoder));
+//        HashMap<Enum<?>, SlowModeMulti> slowModeMap = new HashMap<>();
+//        slowModeMap.put(SMD.SLOW_MODE, SlowModeMulti.basic());
+//        slowModeMap.put(SMD.FAST_MODE, new SlowModeMulti(SlowMode.one(), Button.B));
+//        slowModeMap.put(SMD.SUPER_SLOW_MODE, new SlowModeMulti(new SlowMode(3.0), Button.X));
+//
+//        SlowModeManager slowModeManager = new SlowModeManager(slowModeMap, gamepadPlus1);
 
+        AnalogEncoder aEncoder = new AnalogEncoder(hardwareMap, "potent", 0.0, List.of(new Operation(Operand.MULTIPLY, 81.8)));
+
+        SensorArray sensorArray = new SensorArray()
+                .addSensor(Sensor.touchSensor(hardwareMap, "touch"))
+                .addSensor(Sensor.analogEncoder(aEncoder));
         telemetry.addData("Status", "Initialized");
         telemetry.update();
         driver.update();
 
-        Scribe.getInstance().startLogger("CoolTag");
+        Scribe.getInstance().startLogger("GentrifiedAppsTestOpMode");
         waitForStart();
-        Timeout timeout = new Timeout(5,()->{return gamepadPlus1.buttonJustReleased(Button.DPAD_DOWN);});
+        Timeout timeout = new Timeout(5, () -> {
+            return gamepadPlus1.buttonJustReleased(Button.DPAD_DOWN);
+        });
         timeout.start();
+
+        loopTimeController.setLoopSavingCache(hardwareMap);
         while (opModeIsActive()) {
-            telemetry.addData("aEncoder",aEncoder.getCurrentPosition());
-            sensorArray.autoLoop(loopTimeController.getLoops());
-            sensorArray.allTelemetry(telemetry);
+            telemetry.addData("aEncoder", aEncoder.getCurrentPosition());
+            sensorArray.readAllLoopSaving();
             timeout.update();
-            telemetry.addData("timeout",timeout.isTimedOut());
+            telemetry.addData("timeout", timeout.isTimedOut());
+//            loopTimeController.every(1,()->{});
+
 //            voltageTracker.update();
 //            voltageTracker.telemetry(telemetry);
 //            initMovementController.checkHasMovedOnInit();
@@ -92,16 +117,16 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //            }
 
 //            if (initMovementController.hasMovedOnInit()) {
-                if (gamepadPlus1.buttonJustReleased(Button.A)) {
-                    idler.safeIdle(5, () -> {
-                        telemetry.addData("idler", "idling");
-                        telemetry.update();
-                    });
-                }
+//            if (gamepadPlus1.buttonJustReleased(Button.A)) {
+//                idler.safeIdle(5, () -> {
+//                    telemetry.addData("idler", "idling");
+//                    telemetry.update();
+//                });
+//            }
 //            }
 
-            telemetry.addData("imu",imu.getRobotYawPitchRollAngles().getYaw());
-            DrivePowerCoefficients powerCoefficients = FieldCentricDriver.driveFieldCentric(gamepadPlus1.readFloat(FloatButton.LEFT_X),gamepadPlus1.readFloat(FloatButton.LEFT_Y),gamepadPlus1.readFloat(FloatButton.RIGHT_X), new Angle(imu.getRobotYawPitchRollAngles().getYaw(), AngleUnit.DEGREES));
+            telemetry.addData("imu", imu.getRobotYawPitchRollAngles().getYaw());
+            DrivePowerCoefficients powerCoefficients = FieldCentricDriver.driveFieldCentric(gamepadPlus1.readFloat(FloatButton.LEFT_X), gamepadPlus1.readFloat(FloatButton.LEFT_Y), gamepadPlus1.readFloat(FloatButton.RIGHT_X), new Angle(imu.getRobotYawPitchRollAngles().getYaw(), AngleUnit.DEGREES));
 //            DrivePowerCoefficients powerCoefficients = MecanumDriver.driveMecanum(gamepadPlus1.readFloat(FloatButton.LEFT_X),gamepadPlus1.readFloat(FloatButton.LEFT_Y),gamepadPlus1.readFloat(FloatButton.RIGHT_X));
 
 //            if (!powerCoefficients.notZero()){
@@ -111,15 +136,24 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //                powerCoefficients = teleOpCorrector.correctByAngle(powerCoefficients);
 //            }
             driver.setWheelPower(powerCoefficients);
+//            driver.setWheelPower(powerCoefficients.applySlowMode(slowModeManager));
+//            driver.setWheelPower(new DrivePowerCoefficients(
+//                   slowModeManager.apply(powerCoefficients.getFrontLeft()),
+//                    slowModeManager.apply(powerCoefficients.getFrontRight()),
+//                    slowModeManager.apply(powerCoefficients.getBackLeft()),
+//                    slowModeManager.apply(powerCoefficients.getBackRight()))
+//            );
 
             loopTimeController.update();
-            gamepadPlus1.sync();
-            gamepadPlus2.sync();
 
 //            telemetry.addData("hasMovedOnInit", initMovementController.hasMovedOnInit());
             loopTimeController.telemetry(telemetry);
+//            slowModeManager.telemetry(telemetry);
+            sensorArray.allTelemetry(telemetry);
             driver.update();
-            telemetry.update();
+            driver.getLocalizer().testEncoderDirection(telemetry);
+            gamepadPlus1.sync();
+            gamepadPlus2.sync();
         }
     }
 

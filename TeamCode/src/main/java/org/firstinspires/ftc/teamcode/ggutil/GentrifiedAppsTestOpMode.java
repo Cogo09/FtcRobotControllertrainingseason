@@ -39,6 +39,12 @@ enum SMD {
     SUPER_SLOW_MODE
 }
 
+enum DA{
+    DRIVE,
+    TURN,
+    TEST,
+    IDLE
+}
 @TeleOp
 public class GentrifiedAppsTestOpMode extends LinearOpMode {
 
@@ -74,8 +80,72 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         imu.initialize(new IMU.Parameters(orientationOnRobot));
         imu.resetYaw();
 
+
+        DriverAid driverAid = new DriverAid<>(DA.class);
+        DriverAid.DAFunc func1 = new DriverAid.DAFunc(
+                driverAid,
+                DA.DRIVE,
+                () -> {
+                    telemetry.addData("func1", "drive init");
+                },
+                () -> {
+                    telemetry.addData("func1", "drive constant");
+                },
+                ()->{return false;
+                    },
+                () -> {
+                    telemetry.addData("func1", "drive reset");
+                }
+        );
+
+        DriverAid.DAFunc func2 = new DriverAid.DAFunc(
+                driverAid,
+                DA.TURN,
+                () -> {
+                    telemetry.addData("func2", "turn init");
+                },
+                () -> {
+                    telemetry.addData("func2", "turn constant");
+                },
+                ()->{return false;
+                },
+                () -> {
+                    telemetry.addData("func2", "turn reset");
+                }
+        );
+
+        DriverAid.DAFunc func3 = new DriverAid.DAFunc(
+                driverAid,
+                DA.TEST,
+                () -> {
+                    telemetry.addData("func3", "test init");
+                },
+                () -> {
+                    telemetry.addData("func3", "test constant");
+                },
+                ()->{return false;},
+                () -> {
+                    telemetry.addData("func3", "test reset");
+                }
+        );
+        DriverAid.DAFunc idle = new DriverAid.DAFunc(
+                driverAid,
+                DA.IDLE,
+                () -> {
+                    telemetry.addData("idle", "idle init");
+                },
+                () -> {
+                    telemetry.addData("idle", "idle constant");
+                },
+                ()->{return false;},
+                () -> {
+                    telemetry.addData("idle", "idle reset");
+                }
+        );
+
+        func1.runInit();
+
 //        SlowModeManager slowModeManager = new SlowModeManager(gamepadPlus1);// test with just 1 and default button
-        //new enum
 
 //        HashMap<Enum<?>, SlowModeMulti> slowModeMap = new HashMap<>();
 //        slowModeMap.put(SMD.SLOW_MODE, SlowModeMulti.basic());
@@ -102,6 +172,17 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 
         loopTimeController.setLoopSavingCache(hardwareMap);
         while (opModeIsActive()) {
+            if (gamepadPlus1.buttonPressed(Button.DPAD_RIGHT)) {
+                driverAid.setDriverAidFunction(func1);
+            }else if (gamepadPlus1.buttonPressed(Button.DPAD_UP)){
+                func2.runInit();
+            }else if (gamepadPlus1.buttonPressed(Button.DPAD_LEFT)){
+                func3.runInit();
+            }else if (gamepadPlus1.buttonPressed(Button.DPAD_DOWN)){
+                driverAid.idle(DA.IDLE);
+            }
+            driverAid.update();
+
             telemetry.addData("aEncoder", aEncoder.getCurrentPosition());
             sensorArray.readAllLoopSaving();
             timeout.update();

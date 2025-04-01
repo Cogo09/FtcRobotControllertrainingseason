@@ -53,7 +53,7 @@ dependencies {
     implementation "com.acmerobotics.slothboard:dashboard:0.1.1+0.4.16"
     implementation("dev.frozenmilk.sinister:Sloth:0.2.0")
 
-    implementation 'com.github.GramGra07:GentrifiedAppsUtil:2.0.3-dev10.0.9'
+    implementation 'com.github.GramGra07:GentrifiedAppsUtil:2.0.3-dev10.0.12'
     implementation 'com.github.GramGra07:VelocityVision:1.1.2'
 
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'

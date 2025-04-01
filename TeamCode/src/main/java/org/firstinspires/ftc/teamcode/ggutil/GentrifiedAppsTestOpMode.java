@@ -26,6 +26,7 @@ import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.An
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.MecanumLocalizer;
 import org.gentrifiedApps.gentrifiedAppsUtil.idler.Idler;
 import org.gentrifiedApps.gentrifiedAppsUtil.looptime.LoopTimeController;
+import org.gentrifiedApps.gentrifiedAppsUtil.motionProfiles.SlewRateLimiter;
 import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.Sensor;
 import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.SensorArray;
 
@@ -170,6 +171,8 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         });
         timeout.start();
 
+        SlewRateLimiter flRateLimiter = new SlewRateLimiter(0.5);
+
         loopTimeController.setLoopSavingCache(hardwareMap);
         while (opModeIsActive()) {
             if (gamepadPlus1.buttonPressed(Button.DPAD_RIGHT)) {
@@ -187,6 +190,10 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
             sensorArray.readAllLoopSaving();
             timeout.update();
             telemetry.addData("timeout", timeout.isTimedOut());
+
+            if (gamepadPlus1.readFloat(FloatButton.RIGHT_TRIGGER)>0){
+                driver.setWheelPower(new DrivePowerCoefficients(flRateLimiter.calculate(gamepadPlus1.readFloat(FloatButton.RIGHT_TRIGGER)),0.0,0.0,0.0));
+            }
 //            loopTimeController.every(1,()->{});
 
 //            voltageTracker.update();
@@ -205,6 +212,7 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //                });
 //            }
 //            }
+            
 
             telemetry.addData("imu", imu.getRobotYawPitchRollAngles().getYaw());
             DrivePowerCoefficients powerCoefficients = FieldCentricDriver.driveFieldCentric(gamepadPlus1.readFloat(FloatButton.LEFT_X), gamepadPlus1.readFloat(FloatButton.LEFT_Y), gamepadPlus1.readFloat(FloatButton.RIGHT_X), new Angle(imu.getRobotYawPitchRollAngles().getYaw(), AngleUnit.DEGREES));

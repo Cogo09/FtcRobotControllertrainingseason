@@ -68,6 +68,7 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //        VoltageTracker voltageTracker = new VoltageTracker(this.hardwareMap);
 
         DcMotor motor = hardwareMap.get(DcMotor.class,"motor");
+//        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         SquIDController squidController = new SquIDController(0.001);
@@ -192,6 +193,7 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //        accelerationMotionProfile.start();
 
         SlewRateLimiter slewRateLimiter = new SlewRateLimiter(0.5);
+//        OnlyUpSlewRateLimiter slewRateLimiter = new OnlyUpSlewRateLimiter(0.5);
 //        pidMotor.currentReversed();
 //        pidMotor.setTarget(1000);
 

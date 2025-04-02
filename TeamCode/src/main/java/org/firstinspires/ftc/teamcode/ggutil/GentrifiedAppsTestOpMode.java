@@ -6,20 +6,24 @@ import android.util.Pair;
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
+import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.gamepad.Button;
 import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.gamepad.FloatButton;
 import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.gamepad.GamepadPlus;
-import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.servo.ServoPlus;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.Scribe;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.Timeout;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.AnalogEncoder;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.Operand;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.Operation;
+import org.gentrifiedApps.gentrifiedAppsUtil.controllers.SquIDController;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.DrivePowerCoefficients;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver;
+import org.gentrifiedApps.gentrifiedAppsUtil.driverAid.DriverAid;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.Driver;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.Angle;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.AngleUnit;
@@ -27,8 +31,10 @@ import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.Meca
 import org.gentrifiedApps.gentrifiedAppsUtil.idler.Idler;
 import org.gentrifiedApps.gentrifiedAppsUtil.looptime.LoopTimeController;
 import org.gentrifiedApps.gentrifiedAppsUtil.motionProfiles.SlewRateLimiter;
+import org.gentrifiedApps.gentrifiedAppsUtil.motionProfiles.TrapezoidalMotionProfile;
 import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.Sensor;
 import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.SensorArray;
+import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.servo.ServoPlus;
 
 import java.util.HashMap;
 import java.util.List;
@@ -61,6 +67,13 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         Idler idler = new Idler(this);
 //        VoltageTracker voltageTracker = new VoltageTracker(this.hardwareMap);
 
+        DcMotor motor = hardwareMap.get(DcMotor.class,"motor");
+        motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
+        motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+        SquIDController squidController = new SquIDController(0.001);
+
+//        PIDMotor pidMotor = new PIDMotor(hardwareMap,"motor",0.0001,0.0,0.0,0.0);
+//        pidMotor.reset();
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
         RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
@@ -81,6 +94,11 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         imu.initialize(new IMU.Parameters(orientationOnRobot));
         imu.resetYaw();
 
+        TrapezoidalMotionProfile trapezoidalMotionProfile = new TrapezoidalMotionProfile(1.0, 0.1);
+        trapezoidalMotionProfile.generateProfile(10);
+
+//        AccelerationMotionProfile accelerationMotionProfile = new AccelerationMotionProfile(1.0, 0.1);
+//        accelerationMotionProfile.generateProfile(10);
 
         DriverAid driverAid = new DriverAid<>(DA.class);
         DriverAid.DAFunc func1 = new DriverAid.DAFunc(
@@ -170,18 +188,24 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
             return gamepadPlus1.buttonJustReleased(Button.DPAD_DOWN);
         });
         timeout.start();
+        trapezoidalMotionProfile.start();
+//        accelerationMotionProfile.start();
 
-        SlewRateLimiter flRateLimiter = new SlewRateLimiter(0.5);
+        SlewRateLimiter slewRateLimiter = new SlewRateLimiter(0.5);
+//        pidMotor.currentReversed();
+//        pidMotor.setTarget(1000);
 
         loopTimeController.setLoopSavingCache(hardwareMap);
         while (opModeIsActive()) {
             if (gamepadPlus1.buttonPressed(Button.DPAD_RIGHT)) {
+                servoPlus.setPosition(90);
                 driverAid.setDriverAidFunction(func1);
             }else if (gamepadPlus1.buttonPressed(Button.DPAD_UP)){
                 func2.runInit();
             }else if (gamepadPlus1.buttonPressed(Button.DPAD_LEFT)){
                 func3.runInit();
             }else if (gamepadPlus1.buttonPressed(Button.DPAD_DOWN)){
+                servoPlus.setPosition(0);
                 driverAid.idle(DA.IDLE);
             }
             driverAid.update();
@@ -191,10 +215,15 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
             timeout.update();
             telemetry.addData("timeout", timeout.isTimedOut());
 
-            if (gamepadPlus1.readFloat(FloatButton.RIGHT_TRIGGER)>0){
-                driver.setWheelPower(new DrivePowerCoefficients(flRateLimiter.calculate(gamepadPlus1.readFloat(FloatButton.RIGHT_TRIGGER)),0.0,0.0,0.0));
-            }
-//            loopTimeController.every(1,()->{});
+//            motor.setPower(squidController.calculate(1000,motor.getCurrentPosition()));
+//pidMotor.setPIDPower();
+//telemetry.addData("pidMotor", pidMotor.getCurrentPosition());
+                motor.setPower(slewRateLimiter.calculate(gamepadPlus1.readFloat(FloatButton.RIGHT_TRIGGER)));
+//            motor.setPower(slewRateLimiter.calculate(gamepadPlus1.readFloat(FloatButton.RIGHT_TRIGGER)));
+//            motor.setPower(accelerationMotionProfile.getVelocity());
+//            double trap = trapezoidalMotionProfile.getVelocity();
+//            motor.setPower(trap);
+//            telemetry.addData("trapezoidalMotionProfile", trap);
 
 //            voltageTracker.update();
 //            voltageTracker.telemetry(telemetry);

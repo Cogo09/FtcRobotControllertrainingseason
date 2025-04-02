@@ -1,9 +1,14 @@
 //! idk
-MotionProfiles
-better telemetry
-teleop tracker - repeater
-kalman
-
-
-FieldCentricDriver - needs full inclusive test
+velocity vision
 HeatSeeker
+repeater needs delays
+
+// needs documentation
+pidf controller - i think its already there
+squid
+acceleration mp
+slew motion profile
+trap motion profile
+sensor array - edits
+pid motor
+teleop tracker - repeater

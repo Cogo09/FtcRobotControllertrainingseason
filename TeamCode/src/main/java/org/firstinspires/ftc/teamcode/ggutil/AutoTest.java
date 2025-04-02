@@ -11,7 +11,7 @@ import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.Heatseeker;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generators.EncoderSpecsBuilder;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.Encoder;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.EncoderStorage;
-import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.PIDController;
+import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.ErrorPIDController;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.PathBuilder;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.Angle;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.AngleUnit;
@@ -49,7 +49,7 @@ public class AutoTest extends LinearOpMode {
                 16);
 
         driver.setLocalizer(localizer);
-        Heatseeker heatseeker = new Heatseeker(driver,new PIDController(0.0001,0.0,0.0),new PIDController(0.0001,0.0,0.0),new PIDController(1.0,0.0,0.0));
+        Heatseeker heatseeker = new Heatseeker(driver,new ErrorPIDController(0.0001,0.0,0.0),new ErrorPIDController(0.0001,0.0,0.0),new ErrorPIDController(1.0,0.0,0.0));
         List<Path> waypoints = new PathBuilder()
                 .addWaypoint(new Waypoint(new Target2D(0, 10.0, new Angle(0, AngleUnit.RADIANS)), 0.5))
                 .build();

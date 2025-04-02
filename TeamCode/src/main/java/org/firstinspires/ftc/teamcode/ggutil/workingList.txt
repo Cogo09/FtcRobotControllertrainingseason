@@ -4,11 +4,4 @@ HeatSeeker
 repeater needs delays
 
 // needs documentation
-pidf controller - i think its already there
-squid
-acceleration mp
-slew motion profile - only up slew
-trap motion profile
-sensor array - edits
-pid motor
 teleop tracker - repeater

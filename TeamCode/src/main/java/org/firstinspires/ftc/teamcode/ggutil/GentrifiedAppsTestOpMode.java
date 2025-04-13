@@ -185,6 +185,10 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         telemetry.addData("DataStorage", DataStorage.getPose().toString());
         telemetry.addData("DataStorage", DataStorage.getAlliance().toString());
+        DataStorage.initDataStore();
+        DataStorage.readDataStore();
+        telemetry.addData("DataStorage", DataStorage.getPose().toString());
+        telemetry.addData("DataStorage", DataStorage.getAlliance().toString());
         telemetry.update();
         driver.update();
 
@@ -212,6 +216,7 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
             }else if (gamepadPlus1.buttonPressed(Button.DPAD_LEFT)){
                 func3.runInit();
                 DataStorage.setPose(new Target2D(80,111,2));
+                DataStorage.writeDataStore();
             }else if (gamepadPlus1.buttonPressed(Button.DPAD_DOWN)){
                 servoPlus.setPosition(0);
                 driverAid.idle(DA.IDLE);

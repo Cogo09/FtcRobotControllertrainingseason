@@ -3,4 +3,4 @@ velocity vision
 HeatSeeker
 
 document:
-DataStorage
+DataStorage - data store

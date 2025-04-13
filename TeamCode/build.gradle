@@ -25,7 +25,7 @@ buildscript {
         maven { url "https://repo.dairy.foundation/releases" }
     }
     dependencies {
-        classpath "dev.frozenmilk:Load:0.2.0"
+        classpath "dev.frozenmilk:Load:0.2.1"
     }
 }
 android {
@@ -49,14 +49,13 @@ repositories {
 dependencies {
     implementation project(':FtcRobotController')
 
-//    implementation 'com.acmerobotics.dashboard:dashboard:0.4.16'
-    implementation "com.acmerobotics.slothboard:dashboard:0.1.1+0.4.16"
-    implementation("dev.frozenmilk.sinister:Sloth:0.2.0")
+    implementation("com.acmerobotics.slothboard:dashboard:0.2.1+0.4.16")
+    implementation("dev.frozenmilk.sinister:Sloth:0.2.1")
 
-    implementation 'com.github.DaCodingBeast:PidTuners:-SNAPSHOT'
-
-    implementation 'com.github.GramGra07:GentrifiedAppsUtil:3.0.0'
-    implementation 'com.github.GramGra07:VelocityVision:1.1.2'
+//implementation('com.github.DaCodingBeast:PidTuners:a8a2f0a46f') {
+//        exclude group: 'com.acmerobotics', module: 'dashboard'
+//    }
+    implementation 'com.github.GramGra07:GentrifiedAppsUtil:3.1.1'
 
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
     implementation 'androidx.core:core-ktx:1.15.0'

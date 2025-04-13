@@ -12,30 +12,33 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
-import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.gamepad.Button;
-import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.gamepad.FloatButton;
-import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.gamepad.GamepadPlus;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.Scribe;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.Timeout;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.AnalogEncoder;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.Operand;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.Operation;
-import org.gentrifiedApps.gentrifiedAppsUtil.controllers.SquIDController;
-import org.gentrifiedApps.gentrifiedAppsUtil.drive.DrivePowerCoefficients;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.DrivePowerCoefficients;
+import org.gentrifiedApps.gentrifiedAppsUtil.controllers.driverAid.DriverAid;
+import org.gentrifiedApps.gentrifiedAppsUtil.dataStorage.DataStorage;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver;
-import org.gentrifiedApps.gentrifiedAppsUtil.driverAid.DriverAid;
+import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.Button;
+import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.FloatButton;
+import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.GamepadPlus;
+import org.gentrifiedApps.gentrifiedAppsUtil.hardware.servo.ServoPlus;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.Driver;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.Angle;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.AngleUnit;
+import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.Target2D;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.MecanumLocalizer;
 import org.gentrifiedApps.gentrifiedAppsUtil.idler.Idler;
 import org.gentrifiedApps.gentrifiedAppsUtil.looptime.LoopTimeController;
-import org.gentrifiedApps.gentrifiedAppsUtil.motionProfiles.SlewRateLimiter;
-import org.gentrifiedApps.gentrifiedAppsUtil.motionProfiles.TrapezoidalMotionProfile;
+import org.gentrifiedApps.gentrifiedAppsUtil.motion.controllers.SquIDController;
+import org.gentrifiedApps.gentrifiedAppsUtil.motion.profiles.SlewRateLimiter;
+import org.gentrifiedApps.gentrifiedAppsUtil.motion.profiles.TrapezoidalMotionProfile;
 import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.Sensor;
 import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.SensorArray;
-import org.gentrifiedApps.gentrifiedAppsUtil.classExtenders.servo.ServoPlus;
 
+import java.lang.annotation.Target;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -64,7 +67,7 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //        InitMovementController initMovementController = new InitMovementController(gamepadPlus1, gamepadPlus2);
 //        InitMovementController initMovementController = new InitMovementController(gamepad1, gamepad2);
         ServoPlus servoPlus = new ServoPlus(this.hardwareMap, "servo");
-        Idler idler = new Idler(this);
+        Idler idler = new Idler();
 //        VoltageTracker voltageTracker = new VoltageTracker(this.hardwareMap);
 
         DcMotor motor = hardwareMap.get(DcMotor.class,"motor");
@@ -180,6 +183,8 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
                 .addSensor(Sensor.touchSensor(hardwareMap, "touch"))
                 .addSensor(Sensor.analogEncoder(aEncoder));
         telemetry.addData("Status", "Initialized");
+        telemetry.addData("DataStorage", DataStorage.getPose().toString());
+        telemetry.addData("DataStorage", DataStorage.getAlliance().toString());
         telemetry.update();
         driver.update();
 
@@ -206,9 +211,11 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
                 func2.runInit();
             }else if (gamepadPlus1.buttonPressed(Button.DPAD_LEFT)){
                 func3.runInit();
+                DataStorage.setPose(new Target2D(80,111,2));
             }else if (gamepadPlus1.buttonPressed(Button.DPAD_DOWN)){
                 servoPlus.setPosition(0);
                 driverAid.idle(DA.IDLE);
+                DataStorage.setPose(new Target2D(90.0,10.0,20.0));
             }
             driverAid.update();
 

@@ -1,7 +1,6 @@
 //! idk
 velocity vision
 HeatSeeker
-repeater needs delays
 
-// needs documentation
-teleop tracker - repeater
+document:
+DataStorage

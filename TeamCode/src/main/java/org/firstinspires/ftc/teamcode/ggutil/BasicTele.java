@@ -13,7 +13,7 @@ import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.GamepadPlus;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.Driver;
 import org.gentrifiedApps.gentrifiedAppsUtil.looptime.LoopTimeController;
 
-@TeleOp
+//@TeleOp
 public class BasicTele extends LinearOpMode {
 
     @Override

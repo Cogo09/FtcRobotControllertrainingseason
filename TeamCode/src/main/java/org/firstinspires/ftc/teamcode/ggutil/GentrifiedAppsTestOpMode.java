@@ -33,6 +33,7 @@ import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.Meca
 import org.gentrifiedApps.gentrifiedAppsUtil.idler.Idler;
 import org.gentrifiedApps.gentrifiedAppsUtil.looptime.LoopTimeController;
 import org.gentrifiedApps.gentrifiedAppsUtil.motion.controllers.SquIDController;
+import org.gentrifiedApps.gentrifiedAppsUtil.motion.profiles.MultiSlewLimiter;
 import org.gentrifiedApps.gentrifiedAppsUtil.motion.profiles.SlewRateLimiter;
 import org.gentrifiedApps.gentrifiedAppsUtil.motion.profiles.TrapezoidalMotionProfile;
 import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.Sensor;
@@ -97,6 +98,13 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         IMU imu = hardwareMap.get(IMU.class, "imu");
         imu.initialize(new IMU.Parameters(orientationOnRobot));
         imu.resetYaw();
+
+        MultiSlewLimiter multiSlew = new MultiSlewLimiter()
+                .addLimiter("fl", 0.5)
+                .addLimiter("fr", 0.5)
+                .addLimiter("bl", 0.5)
+                .addLimiter("br", 0.5);
+
 
         TrapezoidalMotionProfile trapezoidalMotionProfile = new TrapezoidalMotionProfile(1.0, 0.1);
         trapezoidalMotionProfile.generateProfile(10);
@@ -186,7 +194,7 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         telemetry.addData("DataStorage", DataStorage.getPose().toString());
         telemetry.addData("DataStorage", DataStorage.getAlliance().toString());
         DataStorage.initDataStore();
-        DataStorage.readDataStore();
+//        DataStorage.readDataStore();
         telemetry.addData("DataStorage", DataStorage.getPose().toString());
         telemetry.addData("DataStorage", DataStorage.getAlliance().toString());
         telemetry.update();
@@ -267,7 +275,14 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //            }else if (gamepadPlus1.readFloat(FloatButton.RIGHT_X) == 0.0){
 //                powerCoefficients = teleOpCorrector.correctByAngle(powerCoefficients);
 //            }
+
             driver.setWheelPower(powerCoefficients);
+            driver.setWheelPower(
+                    new DrivePowerCoefficients(
+                            multiSlew.calculate("fl",powerCoefficients.getFrontLeft()),
+                            multiSlew.calculate("fr",powerCoefficients.getFrontRight()),
+                            multiSlew.calculate("bl",powerCoefficients.getBackLeft()),
+                            multiSlew.calculate("br",powerCoefficients.getBackRight())));
 //            driver.setWheelPower(powerCoefficients.applySlowMode(slowModeManager));
 //            driver.setWheelPower(new DrivePowerCoefficients(
 //                   slowModeManager.apply(powerCoefficients.getFrontLeft()),

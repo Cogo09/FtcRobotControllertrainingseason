@@ -5,7 +5,7 @@ import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
-import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.DrivePowerCoefficients;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.drive.DrivePowerCoefficients;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.MecanumDriver;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.TankDriver;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.FloatButton;

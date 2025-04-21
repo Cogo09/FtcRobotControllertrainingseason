@@ -52,8 +52,8 @@ dependencies {
     implementation("com.acmerobotics.slothboard:dashboard:0.2.1+0.4.16")
     implementation("dev.frozenmilk.sinister:Sloth:0.2.1")
 
-implementation('com.github.DaCodingBeast:PidTuners:646af12d69')
-    implementation 'com.github.GramGra07:GentrifiedAppsUtil:3.2.2'
+implementation('com.github.DaCodingBeast:PidTuners:4e7595ad12')
+    implementation 'com.github.GramGra07:GentrifiedAppsUtil:3.3.7'
 
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'
     implementation 'androidx.core:core-ktx:1.15.0'

@@ -13,11 +13,12 @@ import com.qualcomm.robotcore.hardware.IMU;
 import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.Scribe;
-import org.gentrifiedApps.gentrifiedAppsUtil.classes.Timeout;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.AnalogEncoder;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.Operand;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.Operation;
-import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.DrivePowerCoefficients;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.callbacks.Timeout;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.drive.DrivePowerCoefficients;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.drive.drift.DrivePowerConstraint;
 import org.gentrifiedApps.gentrifiedAppsUtil.controllers.driverAid.DriverAid;
 import org.gentrifiedApps.gentrifiedAppsUtil.dataStorage.DataStorage;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver;
@@ -91,6 +92,7 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //            new IMUParams("imu", new IMU.Parameters(orientationOnRobot))
 //    );
         Driver driver = new Driver(this, "fl", "fr", "bl", "br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE);
+//                .addDriftCorrection(new DrivePowerConstraint(1.0,1.0,1.0,1.0));
 
         MecanumLocalizer localizer = new MecanumLocalizer(driver, 37.74, 16);
         driver.setLocalizer(localizer);
@@ -276,13 +278,15 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //                powerCoefficients = teleOpCorrector.correctByAngle(powerCoefficients);
 //            }
 
+//            driver.setWheelPower(Driver.applyDriftCorrection(powerCoefficients));
+
             driver.setWheelPower(powerCoefficients);
-            driver.setWheelPower(
-                    new DrivePowerCoefficients(
-                            multiSlew.calculate("fl",powerCoefficients.getFrontLeft()),
-                            multiSlew.calculate("fr",powerCoefficients.getFrontRight()),
-                            multiSlew.calculate("bl",powerCoefficients.getBackLeft()),
-                            multiSlew.calculate("br",powerCoefficients.getBackRight())));
+//            driver.setWheelPower(
+//                    new DrivePowerCoefficients(
+//                            multiSlew.calculate("fl",powerCoefficients.getFrontLeft()),
+//                            multiSlew.calculate("fr",powerCoefficients.getFrontRight()),
+//                            multiSlew.calculate("bl",powerCoefficients.getBackLeft()),
+//                            multiSlew.calculate("br",powerCoefficients.getBackRight())));
 //            driver.setWheelPower(powerCoefficients.applySlowMode(slowModeManager));
 //            driver.setWheelPower(new DrivePowerCoefficients(
 //                   slowModeManager.apply(powerCoefficients.getFrontLeft()),

@@ -1,16 +1,13 @@
 package org.firstinspires.ftc.teamcode.ggutil;
 
 
-import android.util.Pair;
-
 import com.qualcomm.hardware.rev.RevHubOrientationOnRobot;
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotor;
-import com.qualcomm.robotcore.hardware.DcMotorController;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
+import com.qualcomm.robotcore.hardware.Gamepad;
 import com.qualcomm.robotcore.hardware.IMU;
-import com.qualcomm.robotcore.hardware.configuration.typecontainers.MotorConfigurationType;
 
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.Scribe;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.AnalogEncoder;
@@ -18,18 +15,21 @@ import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.Operand;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.Operation;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.callbacks.Timeout;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.drive.DrivePowerCoefficients;
-import org.gentrifiedApps.gentrifiedAppsUtil.classes.drive.drift.DrivePowerConstraint;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.pointClasses.Angle;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.pointClasses.AngleUnit;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.pointClasses.Target2D;
 import org.gentrifiedApps.gentrifiedAppsUtil.controllers.driverAid.DriverAid;
 import org.gentrifiedApps.gentrifiedAppsUtil.dataStorage.DataStorage;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.Button;
+import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.ButtonPress;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.FloatButton;
+import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.GamepadMacro;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.GamepadPlus;
+import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.MacroBuilder;
+import org.gentrifiedApps.gentrifiedAppsUtil.hardware.motor.MotorExtensions;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.servo.ServoPlus;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.Driver;
-import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.Angle;
-import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.AngleUnit;
-import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.pointClasses.Target2D;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.localizers.tracking.MecanumLocalizer;
 import org.gentrifiedApps.gentrifiedAppsUtil.idler.Idler;
 import org.gentrifiedApps.gentrifiedAppsUtil.looptime.LoopTimeController;
@@ -40,10 +40,7 @@ import org.gentrifiedApps.gentrifiedAppsUtil.motion.profiles.TrapezoidalMotionPr
 import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.Sensor;
 import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.SensorArray;
 
-import java.lang.annotation.Target;
-import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 enum SMD {
     SLOW_MODE,
@@ -51,12 +48,13 @@ enum SMD {
     SUPER_SLOW_MODE
 }
 
-enum DA{
+enum DA {
     DRIVE,
     TURN,
     TEST,
     IDLE
 }
+
 @TeleOp
 public class GentrifiedAppsTestOpMode extends LinearOpMode {
 
@@ -72,7 +70,7 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         Idler idler = new Idler();
 //        VoltageTracker voltageTracker = new VoltageTracker(this.hardwareMap);
 
-        DcMotor motor = hardwareMap.get(DcMotor.class,"motor");
+        DcMotor motor = hardwareMap.get(DcMotor.class, "motor");
 //        motor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
         motor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
@@ -124,8 +122,9 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
                 () -> {
                     telemetry.addData("func1", "drive constant");
                 },
-                ()->{return false;
-                    },
+                () -> {
+                    return false;
+                },
                 () -> {
                     telemetry.addData("func1", "drive reset");
                 }
@@ -140,7 +139,8 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
                 () -> {
                     telemetry.addData("func2", "turn constant");
                 },
-                ()->{return false;
+                () -> {
+                    return false;
                 },
                 () -> {
                     telemetry.addData("func2", "turn reset");
@@ -156,7 +156,9 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
                 () -> {
                     telemetry.addData("func3", "test constant");
                 },
-                ()->{return false;},
+                () -> {
+                    return false;
+                },
                 () -> {
                     telemetry.addData("func3", "test reset");
                 }
@@ -170,13 +172,19 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
                 () -> {
                     telemetry.addData("idle", "idle constant");
                 },
-                ()->{return false;},
+                () -> {
+                    return false;
+                },
                 () -> {
                     telemetry.addData("idle", "idle reset");
                 }
         );
 
         func1.runInit();
+
+
+        DcMotor pivot = hardwareMap.get(DcMotor.class, "pivot");
+        MotorExtensions.Companion.resetMotor(pivot);
 
 //        SlowModeManager slowModeManager = new SlowModeManager(gamepadPlus1);// test with just 1 and default button
 
@@ -196,7 +204,6 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         telemetry.addData("DataStorage", DataStorage.getPose().toString());
         telemetry.addData("DataStorage", DataStorage.getAlliance().toString());
         DataStorage.initDataStore();
-//        DataStorage.readDataStore();
         telemetry.addData("DataStorage", DataStorage.getPose().toString());
         telemetry.addData("DataStorage", DataStorage.getAlliance().toString());
         telemetry.update();
@@ -210,6 +217,14 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         timeout.start();
         trapezoidalMotionProfile.start();
 //        accelerationMotionProfile.start();
+        GamepadMacro macro = new GamepadMacro(List.of(new ButtonPress(Button.CROSS), new ButtonPress(Button.CROSS)), () -> {
+            timeout.start();
+            timeout.update();
+        });
+//        GamepadMacro macro2 = new GamepadMacro(new MacroBuilder().buttonPress(Button.CROSS).buttonPress(Button.CROSS).build(), () -> {
+//            timeout.start();
+//            timeout.update();
+//        });
 
         SlewRateLimiter slewRateLimiter = new SlewRateLimiter(0.5);
 //        OnlyUpSlewRateLimiter slewRateLimiter = new OnlyUpSlewRateLimiter(0.5);
@@ -218,19 +233,20 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 
         loopTimeController.setLoopSavingCache(hardwareMap);
         while (opModeIsActive()) {
+            macro.update(gamepadPlus1);
             if (gamepadPlus1.buttonPressed(Button.DPAD_RIGHT)) {
                 servoPlus.setPosition(90);
                 driverAid.setDriverAidFunction(func1);
-            }else if (gamepadPlus1.buttonPressed(Button.DPAD_UP)){
+            } else if (gamepadPlus1.buttonPressed(Button.DPAD_UP)) {
                 func2.runInit();
-            }else if (gamepadPlus1.buttonPressed(Button.DPAD_LEFT)){
+            } else if (gamepadPlus1.buttonPressed(Button.DPAD_LEFT)) {
                 func3.runInit();
-                DataStorage.setPose(new Target2D(80,111,2));
+                DataStorage.setPose(new Target2D(80, 111, 2));
                 DataStorage.writeDataStore();
-            }else if (gamepadPlus1.buttonPressed(Button.DPAD_DOWN)){
+            } else if (gamepadPlus1.buttonPressed(Button.DPAD_DOWN)) {
                 servoPlus.setPosition(0);
                 driverAid.idle(DA.IDLE);
-                DataStorage.setPose(new Target2D(90.0,10.0,20.0));
+                DataStorage.setPose(new Target2D(90.0, 10.0, 20.0));
             }
             driverAid.update();
 
@@ -242,7 +258,7 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //            motor.setPower(squidController.calculate(1000,motor.getCurrentPosition()));
 //pidMotor.setPIDPower();
 //telemetry.addData("pidMotor", pidMotor.getCurrentPosition());
-                motor.setPower(slewRateLimiter.calculate(gamepadPlus1.readFloat(FloatButton.RIGHT_TRIGGER)));
+            motor.setPower(slewRateLimiter.calculate(gamepadPlus1.readFloat(FloatButton.RIGHT_TRIGGER)));
 //            motor.setPower(slewRateLimiter.calculate(gamepadPlus1.readFloat(FloatButton.RIGHT_TRIGGER)));
 //            motor.setPower(accelerationMotionProfile.getVelocity());
 //            double trap = trapezoidalMotionProfile.getVelocity();
@@ -265,7 +281,6 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //                });
 //            }
 //            }
-            
 
             telemetry.addData("imu", imu.getRobotYawPitchRollAngles().getYaw());
             DrivePowerCoefficients powerCoefficients = FieldCentricDriver.driveFieldCentric(gamepadPlus1.readFloat(FloatButton.LEFT_X), gamepadPlus1.readFloat(FloatButton.LEFT_Y), gamepadPlus1.readFloat(FloatButton.RIGHT_X), new Angle(imu.getRobotYawPitchRollAngles().getYaw(), AngleUnit.DEGREES));
@@ -277,7 +292,6 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //            }else if (gamepadPlus1.readFloat(FloatButton.RIGHT_X) == 0.0){
 //                powerCoefficients = teleOpCorrector.correctByAngle(powerCoefficients);
 //            }
-
 //            driver.setWheelPower(Driver.applyDriftCorrection(powerCoefficients));
 
             driver.setWheelPower(powerCoefficients);
@@ -307,5 +321,4 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
             gamepadPlus2.sync();
         }
     }
-
 }

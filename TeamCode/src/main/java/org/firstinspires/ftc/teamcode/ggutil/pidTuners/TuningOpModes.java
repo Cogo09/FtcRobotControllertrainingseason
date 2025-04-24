@@ -53,7 +53,7 @@ public final class TuningOpModes {
     static PIDParams pidParams = new PIDParams(0.0, 0.0, 0.0, 0.0);
     static AngleRange angleRange = AngleRange.fromDegrees(0.0,90.0);
     static PivotSystemConstants pivotSystemConstants = new PivotSystemConstants(inertia, frictionRPM, new GravityModelConstants(0.0,0.0,0.0));
-    public static ArmMotor armMotor = new ArmMotor.Builder("pivot", DcMotorSimple.Direction.FORWARD,Hardware.YellowJacket.RPM435,pivotSystemConstants,angleRange.asArrayList())
+    public static ArmMotor armMotor = new ArmMotor.Builder("pivot", DcMotorSimple.Direction.REVERSE,Hardware.YellowJacket.RPM435,pivotSystemConstants,angleRange.asArrayList())
             .pidParams(pidParams)
             .build();
 
@@ -82,6 +82,10 @@ public final class TuningOpModes {
         manager.register(
                 metaForClass(FindPID.class, "Arm"), new FindPID(armMotor)
         );
+
+        manager.register(
+                    metaForClass(GravityTest.class, "Arm"), new GravityTest(armMotor)
+            );
     }
 }
 

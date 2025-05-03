@@ -20,6 +20,7 @@ import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.pointClasses.Targe
 import org.gentrifiedApps.gentrifiedAppsUtil.controllers.driverAid.DriverAid;
 import org.gentrifiedApps.gentrifiedAppsUtil.dataStorage.DataStorage;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver;
+import org.gentrifiedApps.gentrifiedAppsUtil.drive.MecanumDriver;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.Button;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.FloatButton;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.GamepadMacro;
@@ -277,8 +278,8 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //            }
 
             telemetry.addData("imu", imu.getRobotYawPitchRollAngles().getYaw());
-            DrivePowerCoefficients powerCoefficients = FieldCentricDriver.driveFieldCentric(gamepadPlus1.readFloat(FloatButton.LEFT_X), gamepadPlus1.readFloat(FloatButton.LEFT_Y), gamepadPlus1.readFloat(FloatButton.RIGHT_X), new Angle(imu.getRobotYawPitchRollAngles().getYaw(), AngleUnit.DEGREES));
-//            DrivePowerCoefficients powerCoefficients = MecanumDriver.driveMecanum(gamepadPlus1.readFloat(FloatButton.LEFT_X),gamepadPlus1.readFloat(FloatButton.LEFT_Y),gamepadPlus1.readFloat(FloatButton.RIGHT_X));
+//            DrivePowerCoefficients powerCoefficients = FieldCentricDriver.driveFieldCentric(gamepadPlus1.readFloat(FloatButton.LEFT_X), gamepadPlus1.readFloat(FloatButton.LEFT_Y), gamepadPlus1.readFloat(FloatButton.RIGHT_X), new Angle(imu.getRobotYawPitchRollAngles().getYaw(), AngleUnit.DEGREES));
+            DrivePowerCoefficients powerCoefficients = MecanumDriver.driveMecanum(-gamepadPlus1.readFloat(FloatButton.LEFT_X),gamepadPlus1.readFloat(FloatButton.LEFT_Y),-gamepadPlus1.readFloat(FloatButton.RIGHT_X));
 
 //            if (!powerCoefficients.notZero()){
 //                // has no powers to move

@@ -31,6 +31,6 @@ public final class OpModeRepeaterRegistrar {
         if (!isEnabled) return;
         manager.register(metaForClass(TeleOpCopyRunner.class, OpModeMeta.Flavor.AUTONOMOUS), new TeleOpCopyRunner(name, driver));
         manager.register(metaForClass(TeleOpTrackerOpMode.class, OpModeMeta.Flavor.TELEOP), new TeleOpTrackerOpMode(name, driver));
-        manager.register(metaForClass(DriftTunerOpMode.class, OpModeMeta.Flavor.AUTONOMOUS), new DriftTunerOpMode(new Driver("fl", "fr", "bl", "br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE),3)); //! now has a time param (optional)
+        manager.register(metaForClass(DriftTunerOpMode.class, OpModeMeta.Flavor.AUTONOMOUS), new DriftTunerOpMode(new Driver("frontLeftMotor", "frontRightMotor", "backLeftMotor", "backRightMotor", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE),3)); //! now has a time param (optional)
     }
 }

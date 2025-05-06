@@ -27,7 +27,7 @@ public class ChildTele extends LinearOpMode {
         GamepadPlus gamepadPlus2 = new GamepadPlus(gamepad2);
 
         Driver driver = new Driver(this, "fl", "fr", "bl", "br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE);
-        HashMap<Enum<?>, SlowModeMulti> slowModeMap = new HashMap<>();
+        HashMap<Enum<?>, SlowModeMulti> slowModeMap = new HashMap<Enum<?>, SlowModeMulti>();
         slowModeMap.put(SMD.SLOW_MODE, new SlowModeMulti(SlowMode.of(2.0), Button.B));
         SlowModeManager slowModeManager = new SlowModeManager(slowModeMap,gamepadPlus1);
 

@@ -16,7 +16,10 @@ import org.gentrifiedApps.gentrifiedAppsUtil.classes.callbacks.Timeout;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.drive.DrivePowerCoefficients;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.pointClasses.Angle;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.pointClasses.AngleUnit;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.pointClasses.Point;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.pointClasses.Target2D;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.odometer.Odometer;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.speedometer.Speedometer;
 import org.gentrifiedApps.gentrifiedAppsUtil.controllers.driverAid.DriverAid;
 import org.gentrifiedApps.gentrifiedAppsUtil.dataStorage.DataStorage;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver;
@@ -28,6 +31,7 @@ import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.GamepadPlus;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.motor.MotorExtensions;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.servo.ServoPlus;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.Driver;
+import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.EncoderSpecs;
 import org.gentrifiedApps.gentrifiedAppsUtil.idler.Idler;
 import org.gentrifiedApps.gentrifiedAppsUtil.looptime.LoopTimeController;
 import org.gentrifiedApps.gentrifiedAppsUtil.motion.controllers.SquIDController;
@@ -88,6 +92,9 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 //    );
         Driver driver = new Driver(this, "fl", "fr", "bl", "br", DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE, DcMotorSimple.Direction.FORWARD, DcMotorSimple.Direction.REVERSE);
 //                .addDriftCorrection(new DrivePowerConstraint(1.0,1.0,1.0,1.0));
+
+        Odometer odo = Odometer.newOdometer(driver);
+        odo.addConstraint(new EncoderSpecs(20));
 
 
         IMU imu = hardwareMap.get(IMU.class, "imu");
@@ -204,6 +211,8 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         telemetry.addData("DataStorage", DataStorage.getAlliance().toString());
         telemetry.update();
 
+        Speedometer speedometer = Speedometer.newSpeedometer(driver,EncoderSpecs.ticksPerIn(20));
+
         Scribe.getInstance().startLogger("GentrifiedAppsTestOpMode");
         waitForStart();
         Timeout timeout = new Timeout(5, () -> {
@@ -228,6 +237,10 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
 
         loopTimeController.setLoopSavingCache(hardwareMap);
         while (opModeIsActive()) {
+            speedometer.update();
+            speedometer.telemetry(telemetry);
+            odo.update();
+            odo.telemetry(telemetry);
             macro.update(gamepadPlus1);
             if (gamepadPlus1.buttonPressed(Button.DPAD_RIGHT)) {
                 servoPlus.setPosition(90);

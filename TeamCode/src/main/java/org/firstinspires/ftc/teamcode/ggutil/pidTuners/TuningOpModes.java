@@ -69,9 +69,10 @@ public final class TuningOpModes {
                 .setFlavor(OpModeMeta.Flavor.TELEOP)
                 .build();
     }
-
+    static boolean en = false;
     @OpModeRegistrar
     public static void register(OpModeManager manager) {
+        if (!en) return;
         manager.register(metaForClass(PSODirectionDebugger.class, ""), new PSODirectionDebugger(null, armMotor));
         manager.register(
                 metaForClass(FrictionTest.class, "Arm"), new FrictionTest(armMotor)

@@ -7,6 +7,8 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.Scribe;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.drive.DrivePowerCoefficients;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.drive.avoidance.AvoidanceController;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.drive.avoidance.VectorField;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.pointClasses.Point;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.Driver;
 

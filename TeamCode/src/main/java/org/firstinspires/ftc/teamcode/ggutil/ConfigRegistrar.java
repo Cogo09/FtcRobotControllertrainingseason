@@ -6,6 +6,8 @@ import com.qualcomm.robotcore.eventloop.opmode.OpModeRegistrar;
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
 import org.gentrifiedApps.gentrifiedAppsUtil.config.ConfigCreator;
 import org.gentrifiedApps.gentrifiedAppsUtil.config.ConfigMaker;
+import org.gentrifiedApps.gentrifiedAppsUtil.controllers.kinematics.AutoLevel1DfTuner;
+import org.gentrifiedApps.gentrifiedAppsUtil.hardware.servo.ServoTesterOpMode;
 
 public final class ConfigRegistrar {
     static ConfigMaker config = new ConfigMaker("pinkbot")
@@ -17,9 +19,10 @@ public final class ConfigRegistrar {
 .addMotor("fr", ConfigMaker.ModuleType.CONTROL_HUB, ConfigMaker.MotorType.RevRoboticsUltraplanetaryHDHexMotor, 2)
 .addMotor("bl", ConfigMaker.ModuleType.CONTROL_HUB, ConfigMaker.MotorType.RevRoboticsUltraplanetaryHDHexMotor, 1)
 .addMotor("br", ConfigMaker.ModuleType.CONTROL_HUB, ConfigMaker.MotorType.RevRoboticsUltraplanetaryHDHexMotor, 0)
-            .addMotor("pivot", ConfigMaker.ModuleType.EXPANSION_HUB, ConfigMaker.MotorType.goBILDA5202SeriesMotor, 2)
+            .addMotor("pivot", ConfigMaker.ModuleType.EXPANSION_HUB, ConfigMaker.MotorType.goBILDA5202SeriesMotor, 1)
             .addDevice("servo", ConfigMaker.ModuleType.CONTROL_HUB, ConfigMaker.DeviceType.Servo, 0)
             .addDevice("potent", ConfigMaker.ModuleType.CONTROL_HUB, ConfigMaker.DeviceType.AnalogInput, 0)
+            .addMotor("enc", ConfigMaker.ModuleType.EXPANSION_HUB, ConfigMaker.MotorType.RevRoboticsUltraplanetaryHDHexMotor, 2)
             .addDevice("touch", ConfigMaker.ModuleType.CONTROL_HUB, ConfigMaker.DeviceType.RevTouchSensor, 0);
 
     static boolean isEnabled = true;
@@ -38,5 +41,14 @@ public final class ConfigRegistrar {
     public static void register(OpModeManager manager) {
         if (!isEnabled) return;
         manager.register(metaForClass(ConfigCreator.class), new ConfigCreator(config));
+        manager.register(metaForClass(ServoTesterOpMode.class),new ServoTesterOpMode("servo"));
+        manager.register(metaForClass(AutoLevel1DfTuner.class),new
+                AutoLevel1DfTuner(
+                "servo",
+                "enc",
+                null,
+               (double) 90 /8192
+        ));
+
     }
 }

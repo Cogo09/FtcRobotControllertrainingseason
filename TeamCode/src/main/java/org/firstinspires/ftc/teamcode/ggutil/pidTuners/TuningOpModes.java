@@ -6,8 +6,9 @@ import com.dacodingbeast.pidtuners.Constants.SlideSystemConstants;
 import com.dacodingbeast.pidtuners.HardwareSetup.ArmMotor;
 import com.dacodingbeast.pidtuners.HardwareSetup.Hardware;
 import com.dacodingbeast.pidtuners.HardwareSetup.SlideMotor;
+import com.dacodingbeast.pidtuners.Opmodes.FrictionTest;
+import com.dacodingbeast.pidtuners.Opmodes.GravityTest;
 import com.dacodingbeast.pidtuners.Opmodes.PSODirectionDebugger;
-import com.dacodingbeast.pidtuners.Opmodes.SampleOpMode;
 import com.dacodingbeast.pidtuners.Simulators.AngleRange;
 import com.dacodingbeast.pidtuners.Simulators.SlideRange;
 import com.dacodingbeast.pidtuners.utilities.DataLogger;
@@ -45,11 +46,11 @@ public final class TuningOpModes {
 //            Hardware.YellowJacket.RPM223,
 //            spoolDiameter, slideSystemConstants, 1.0, pidParams, slideRange.asArrayList());
 
-    static double frictionRPM = 62.98689004042872;
+    static double frictionRPM = 68.0;
     static double inertia = 0.00956980942013831;
-    static PIDParams pidParams = new PIDParams(0.29375316553118425, 0.4965531088119277, 1.3388530831502654, 2.0955102734275366);
+    static PIDParams pidParams = new PIDParams(0.8309642452677022, 0.4639855660708491, 2.2725136718435635, 1.1160749866581584);
     static AngleRange angleRange = AngleRange.fromDegrees(0.0,45.0);
-    static PivotSystemConstants pivotSystemConstants = new PivotSystemConstants(inertia, frictionRPM, new GravityModelConstants(-1.9852781084748146,0.1932062495195341,0.42586130838651726 ));
+    static PivotSystemConstants pivotSystemConstants = new PivotSystemConstants(inertia, frictionRPM, new GravityModelConstants(-1.7665847459031714,0.1932062495195341,0.42586130838651726 ));
     public static ArmMotor armMotor = new ArmMotor.Builder("pivot", DcMotorSimple.Direction.FORWARD,new Hardware.HDHex(Hardware.HDHexGearRatios.GR5_1, Hardware.HDHexGearRatios.GR3_1, Hardware.HDHexGearRatios.GR5_1).getMotorSpecs(),pivotSystemConstants,angleRange.asArrayList())
             .pidParams(pidParams)
             .build();
@@ -69,7 +70,7 @@ public final class TuningOpModes {
     @OpModeRegistrar
     public static void register(OpModeManager manager) {
         if (!en) return;
-        manager.register(metaForClass(PSODirectionDebugger.class, ""), new PSODirectionDebugger(null, armMotor));
+//        manager.register(metaForClass(PSODirectionDebugger.class, ""), new PSODirectionDebugger(null, armMotor));
         manager.register(
                 metaForClass(FrictionTest.class, "Arm"), new FrictionTest(armMotor)
         );

@@ -23,9 +23,12 @@ buildscript {
             url "https://repo.dairy.foundation/snapshots"
         }
         maven { url "https://repo.dairy.foundation/releases" }
+            maven {
+                url = 'https://maven.brott.dev/'
+            }
     }
     dependencies {
-        classpath "dev.frozenmilk:Load:0.2.1"
+        classpath "dev.frozenmilk:Load:0.2.2"
     }
 }
 android {
@@ -48,11 +51,18 @@ repositories {
 }
 dependencies {
     implementation project(':FtcRobotController')
+    implementation("dev.frozenmilk.sinister:Sloth:0.2.2")
 
-    implementation("com.acmerobotics.slothboard:dashboard:0.2.1+0.4.16")
-    implementation("dev.frozenmilk.sinister:Sloth:0.2.1")
 
 implementation('com.github.DaCodingBeast:PidTuners:0c5a3e6a4b')
+    implementation "com.acmerobotics.roadrunner:core:1.0.1"
+    implementation("com.acmerobotics.roadrunner:ftc:0.1.23") {
+        exclude group: "com.acmerobotics.dashboard"
+    }
+    implementation ("com.acmerobotics.roadrunner:actions:1.0.1"){
+        exclude group: "com.acmerobotics.dashboard"
+    }
+    implementation("com.acmerobotics.slothboard:dashboard:0.2.2+0.4.16")
     implementation 'com.github.GramGra07:GentrifiedAppsUtil:4.6.0'
 
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'

@@ -191,8 +191,8 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         func1.runInit();
 
 
-//        DcMotor pivot = hardwareMap.get(DcMotor.class, "pivot");
-//        MotorExtensions.Companion.resetMotor(pivot);
+        DcMotor pivot = hardwareMap.get(DcMotor.class, "pivot");
+        MotorExtensions.Companion.resetMotor(pivot);
 
 //        SlowModeManager slowModeManager = new SlowModeManager(gamepadPlus1);// test with just 1 and default button
 

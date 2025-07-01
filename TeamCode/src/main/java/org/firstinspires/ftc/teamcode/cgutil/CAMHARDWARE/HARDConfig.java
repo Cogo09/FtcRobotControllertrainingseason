@@ -94,6 +94,12 @@ public class HARDConfig {
             multiplier = slowmodemultiplier;
         }
 
+        if (opMode.gamepad2.dpad_up) {
+            armSub.setUptarget(2200);
+        } else if (opMode.gamepad2.dpad_down) {
+            armSub.setUptarget(100);//k
+        }
+
 
 //        armMotor1.setPower(armpower);
         clawsub.update();

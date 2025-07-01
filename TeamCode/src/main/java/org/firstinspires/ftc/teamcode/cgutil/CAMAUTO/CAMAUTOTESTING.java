@@ -9,7 +9,7 @@ import org.firstinspires.ftc.teamcode.cgutil.CAMHARDWARE.AUTOHARD;
 
 
 @Autonomous
-public class AUTOTESTING extends LinearOpMode {
+public class CAMAUTOTESTING extends LinearOpMode {
     AUTOHARD robot = null;
     ///
     ///

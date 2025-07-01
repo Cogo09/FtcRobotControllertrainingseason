@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.cgutil.CAMHARDWARE.;
+package org.firstinspires.ftc.teamcode.cgutil.CAMHARDWARE;
 
 import androidx.annotation.NonNull;
 
@@ -19,7 +19,7 @@ import com.qualcomm.robotcore.util.Range;
 
 import org.firstinspires.ftc.robotcore.external.navigation.AngleUnit;
 import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
-import org.firstinspires.ftc.teamcode.followers.roadrunner.MecanumDrive;
+import org.firstinspires.ftc.teamcode.cgutil.roadrunner.MecanumDrive;
 
 import java.util.List;
 
@@ -1372,37 +1372,37 @@ public class AUTOHARD extends HARDConfig {
         return new end();
     }
 
-    public void armextend(double maxDriveSpeed,
-                          double distance, double heading) {
-
-        // Ensure that the OpMode is still active
-        if (opMode.opModeIsActive()) {
-
-            // Determine new target position, and pass to motor controller
-            int moveCounts = (int) (distance * COUNT_PER_INCH_ARM);
-            armMotorTarget = armMotor1.getCurrentPosition() + moveCounts;
-
-            // Set Target FIRST, then turn on RUN_TO_POSITION
-            armMotor1.setTargetPosition((int) armMotorTarget);
-
-            armMotor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-
-            // Set the required driving speed  (must be positive for RUN_TO_POSITION)
-            // Start driving straight, and then enter the control loop
-            armMotor1.setPower(1);
-
-            // keep looping while we are still active, and BOTH motors are running.
-            while (opMode.opModeIsActive() &&
-                    (armMotor1.isBusy())) {
-                telemetry.addData("current pose", armMotor1.getCurrentPosition());
-                telemetry.addData("targetPose", armMotorTarget);
-                telemetry.update();
-            }
-
-            // Stop all motion & Turn off RUN_TO_POSITION
-            armMotor1.setPower(0);
-            armMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
-        }
-    }
+//    public void armextend(double maxDriveSpeed,
+//                          double distance, double heading) {
+//
+//        // Ensure that the OpMode is still active
+//        if (opMode.opModeIsActive()) {
+//
+//            // Determine new target position, and pass to motor controller
+//            int moveCounts = (int) (distance * COUNT_PER_INCH_ARM);
+//            armMotorTarget = armMotor1.getCurrentPosition() + moveCounts;
+//
+//            // Set Target FIRST, then turn on RUN_TO_POSITION
+//            armMotor1.setTargetPosition((int) armMotorTarget);
+//
+//            armMotor1.setMode(DcMotor.RunMode.RUN_TO_POSITION);
+//
+//            // Set the required driving speed  (must be positive for RUN_TO_POSITION)
+//            // Start driving straight, and then enter the control loop
+//            armMotor1.setPower(1);
+//
+//            // keep looping while we are still active, and BOTH motors are running.
+//            while (opMode.opModeIsActive() &&
+//                    (armMotor1.isBusy())) {
+//                telemetry.addData("current pose", armMotor1.getCurrentPosition());
+//                telemetry.addData("targetPose", armMotorTarget);
+//                telemetry.update();
+//            }
+//
+//            // Stop all motion & Turn off RUN_TO_POSITION
+//            armMotor1.setPower(0);
+//            armMotor1.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
+//        }
+//    }
 }
 

@@ -12,8 +12,10 @@ import org.gentrifiedApps.gentrifiedAppsUtil.classes.Scribe;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.AnalogEncoder;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.Operand;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.analogEncoder.Operation;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.caching.CacheManager;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.callbacks.Timeout;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.drive.DrivePowerCoefficients;
+import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.TimeMachinePair;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.pointClasses.Angle;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.pointClasses.AngleUnit;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.generics.pointClasses.Point;
@@ -29,6 +31,7 @@ import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.FloatButton;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.GamepadMacro;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.GamepadPlus;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.motor.MotorExtensions;
+import org.gentrifiedApps.gentrifiedAppsUtil.hardware.motor.PIDMotor;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.servo.ServoPlus;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.Driver;
 import org.gentrifiedApps.gentrifiedAppsUtil.heatseeker.generics.EncoderSpecs;
@@ -77,8 +80,11 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         motor.setMode(DcMotor.RunMode.RUN_USING_ENCODER);
         SquIDController squidController = new SquIDController(0.001);
 
-//        PIDMotor pidMotor = new PIDMotor(hardwareMap,"motor",0.0001,0.0,0.0,0.0);
-//        pidMotor.reset();
+        PIDMotor pidMotor = new PIDMotor(hardwareMap,"motor",0.01,0.0,0.0,0.0);
+        pidMotor.setDirection(DcMotorSimple.Direction.REVERSE);
+        pidMotor.currentReversed();
+        pidMotor.reset();
+        pidMotor.setTarget(1000);
         RevHubOrientationOnRobot.LogoFacingDirection logoDirection = RevHubOrientationOnRobot.LogoFacingDirection.UP;
         RevHubOrientationOnRobot.UsbFacingDirection usbDirection = RevHubOrientationOnRobot.UsbFacingDirection.FORWARD;
         RevHubOrientationOnRobot orientationOnRobot = new RevHubOrientationOnRobot(logoDirection, usbDirection);
@@ -251,7 +257,7 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
                 func3.runInit();
                 DataStorage.setPose(new Target2D(80, 111, 2));
                 DataStorage.writeDataStore();
-            } else if (gamepadPlus1.buttonPressed(Button.DPAD_DOWN)) {
+            } else if (gamepadPlus1.buttonJustPressed(Button.DPAD_DOWN)) {
                 servoPlus.setPosition(0);
                 driverAid.idle(DA.IDLE);
                 DataStorage.setPose(new Target2D(90.0, 10.0, 20.0));
@@ -264,8 +270,8 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
             telemetry.addData("timeout", timeout.isTimedOut());
 
 //            motor.setPower(squidController.calculate(1000,motor.getCurrentPosition()));
-//pidMotor.setPIDPower();
-//telemetry.addData("pidMotor", pidMotor.getCurrentPosition());
+pidMotor.setPIDPower();
+telemetry.addData("pidMotor", pidMotor.getCurrentPosition());
             motor.setPower(slewRateLimiter.calculate(gamepadPlus1.readFloat(FloatButton.RIGHT_TRIGGER)));
 //            motor.setPower(slewRateLimiter.calculate(gamepadPlus1.readFloat(FloatButton.RIGHT_TRIGGER)));
 //            motor.setPower(accelerationMotionProfile.getVelocity());

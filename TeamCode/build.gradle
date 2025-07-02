@@ -28,7 +28,7 @@ buildscript {
             }
     }
     dependencies {
-        classpath "dev.frozenmilk:Load:0.2.2"
+        classpath "dev.frozenmilk:Load:0.2.3"
     }
 }
 android {
@@ -51,10 +51,10 @@ repositories {
 }
 dependencies {
     implementation project(':FtcRobotController')
-    implementation("dev.frozenmilk.sinister:Sloth:0.2.2")
+    implementation("dev.frozenmilk.sinister:Sloth:0.2.3")
 
 
-implementation('com.github.DaCodingBeast:PidTuners:4d3b12d46f')
+implementation('com.github.DaCodingBeast:PidTuners:58c519bb4c')
     implementation "com.acmerobotics.roadrunner:core:1.0.1"
     implementation("com.acmerobotics.roadrunner:ftc:0.1.23") {
         exclude group: "com.acmerobotics.dashboard"
@@ -62,7 +62,7 @@ implementation('com.github.DaCodingBeast:PidTuners:4d3b12d46f')
     implementation ("com.acmerobotics.roadrunner:actions:1.0.1"){
         exclude group: "com.acmerobotics.dashboard"
     }
-    implementation("com.acmerobotics.slothboard:dashboard:0.2.2+0.4.16")
+    implementation("com.acmerobotics.slothboard:dashboard:0.2.3+0.4.16")
     implementation 'com.github.GramGra07:GentrifiedAppsUtil:4.6.0'
 
     implementation 'com.google.guava:listenablefuture:9999.0-empty-to-avoid-conflict-with-guava'

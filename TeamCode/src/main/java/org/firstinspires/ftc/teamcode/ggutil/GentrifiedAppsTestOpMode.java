@@ -26,10 +26,6 @@ import org.gentrifiedApps.gentrifiedAppsUtil.controllers.driverAid.DriverAid;
 import org.gentrifiedApps.gentrifiedAppsUtil.dataStorage.DataStorage;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.FieldCentricDriver;
 import org.gentrifiedApps.gentrifiedAppsUtil.drive.MecanumDriver;
-import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.Button;
-import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.FloatButton;
-import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.GamepadMacro;
-import org.gentrifiedApps.gentrifiedAppsUtil.hardware.gamepad.GamepadPlus;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.motor.MotorExtensions;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.motor.PIDMotor;
 import org.gentrifiedApps.gentrifiedAppsUtil.hardware.servo.ServoPlus;
@@ -46,11 +42,6 @@ import org.gentrifiedApps.gentrifiedAppsUtil.sensorArray.SensorArray;
 
 import java.util.List;
 
-enum SMD {
-    SLOW_MODE,
-    FAST_MODE,
-    SUPER_SLOW_MODE
-}
 
 enum DA {
     DRIVE,
@@ -66,8 +57,6 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
     @Override
     public void runOpMode() throws InterruptedException {
         LoopTimeController loopTimeController = new LoopTimeController();
-        GamepadPlus gamepadPlus1 = new GamepadPlus(gamepad1 );
-        GamepadPlus gamepadPlus2 = new GamepadPlus(gamepad2);
 //        InitMovementController initMovementController = new InitMovementController(gamepadPlus1, gamepadPlus2);
 //        InitMovementController initMovementController = new InitMovementController(gamepad1, gamepad2);
         ServoPlus servoPlus = new ServoPlus(this.hardwareMap, "servo");
@@ -222,19 +211,11 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
         Scribe.getInstance().startLogger("GentrifiedAppsTestOpMode");
         waitForStart();
         Timeout timeout = new Timeout(5, () -> {
-            return gamepadPlus1.buttonJustReleased(Button.DPAD_DOWN);
+            return gamepad1.dpadDownWasPressed();
         });
         timeout.start();
         trapezoidalMotionProfile.start();
 //        accelerationMotionProfile.start();
-        GamepadMacro macro = new GamepadMacro(List.of((Button.L1),(Button.L1)), () -> {
-            timeout.start();
-            timeout.update();
-        });
-//        GamepadMacro macro2 = new GamepadMacro(new MacroBuilder().buttonPress(Button.CROSS).buttonPress(Button.CROSS).build(), () -> {
-//            timeout.start();
-//            timeout.update();
-//        });
 
         SlewRateLimiter slewRateLimiter = new SlewRateLimiter(0.5);
 //        OnlyUpSlewRateLimiter slewRateLimiter = new OnlyUpSlewRateLimiter(0.5);
@@ -247,17 +228,16 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
             speedometer.telemetry(telemetry);
             odo.update();
             odo.telemetry(telemetry);
-            macro.update(gamepadPlus1);
-            if (gamepadPlus1.buttonPressed(Button.DPAD_RIGHT)) {
+            if (gamepad1.dpadLeftWasPressed()) {
                 servoPlus.setPosition(90);
                 driverAid.setDriverAidFunction(func1);
-            } else if (gamepadPlus1.buttonPressed(Button.DPAD_UP)) {
+            } else if (gamepad1.dpadRightWasPressed()) {
                 func2.runInit();
-            } else if (gamepadPlus1.buttonPressed(Button.DPAD_LEFT)) {
+            } else if (gamepad1.dpadUpWasPressed()) {
                 func3.runInit();
                 DataStorage.setPose(new Target2D(80, 111, 2));
                 DataStorage.writeDataStore();
-            } else if (gamepadPlus1.buttonJustPressed(Button.DPAD_DOWN)) {
+            } else if (gamepad1.dpadDownWasPressed()) {
                 servoPlus.setPosition(0);
                 driverAid.idle(DA.IDLE);
                 DataStorage.setPose(new Target2D(90.0, 10.0, 20.0));
@@ -270,9 +250,9 @@ public class GentrifiedAppsTestOpMode extends LinearOpMode {
             telemetry.addData("timeout", timeout.isTimedOut());
 
 //            motor.setPower(squidController.calculate(1000,motor.getCurrentPosition()));
-pidMotor.setPIDPower();
-telemetry.addData("pidMotor", pidMotor.getCurrentPosition());
-            motor.setPower(slewRateLimiter.calculate(gamepadPlus1.readFloat(FloatButton.RIGHT_TRIGGER)));
+            pidMotor.setPIDPower();
+            telemetry.addData("pidMotor", pidMotor.getCurrentPosition());
+            motor.setPower(slewRateLimiter.calculate(gamepad1.left_trigger));
 //            motor.setPower(slewRateLimiter.calculate(gamepadPlus1.readFloat(FloatButton.RIGHT_TRIGGER)));
 //            motor.setPower(accelerationMotionProfile.getVelocity());
 //            double trap = trapezoidalMotionProfile.getVelocity();
@@ -298,7 +278,7 @@ telemetry.addData("pidMotor", pidMotor.getCurrentPosition());
 
             telemetry.addData("imu", imu.getRobotYawPitchRollAngles().getYaw());
 //            DrivePowerCoefficients powerCoefficients = FieldCentricDriver.driveFieldCentric(gamepadPlus1.readFloat(FloatButton.LEFT_X), gamepadPlus1.readFloat(FloatButton.LEFT_Y), gamepadPlus1.readFloat(FloatButton.RIGHT_X), new Angle(imu.getRobotYawPitchRollAngles().getYaw(), AngleUnit.DEGREES));
-            DrivePowerCoefficients powerCoefficients = MecanumDriver.driveMecanum(-gamepadPlus1.readFloat(FloatButton.LEFT_X),gamepadPlus1.readFloat(FloatButton.LEFT_Y),-gamepadPlus1.readFloat(FloatButton.RIGHT_X));
+            DrivePowerCoefficients powerCoefficients = MecanumDriver.driveMecanum(-gamepad1.left_stick_x, gamepad1.left_stick_y, -gamepad1.right_stick_x);
 
 //            if (!powerCoefficients.notZero()){
 //                // has no powers to move
@@ -329,8 +309,6 @@ telemetry.addData("pidMotor", pidMotor.getCurrentPosition());
             loopTimeController.telemetry(telemetry);
 //            slowModeManager.telemetry(telemetry);
             sensorArray.allTelemetry(telemetry);
-            gamepadPlus1.sync();
-            gamepadPlus2.sync();
             telemetry.update();
         }
     }

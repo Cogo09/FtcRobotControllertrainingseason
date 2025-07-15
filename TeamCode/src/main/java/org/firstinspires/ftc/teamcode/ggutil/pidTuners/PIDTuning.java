@@ -70,7 +70,7 @@ public final class PIDTuning {
         manager.register(metaForClass(SlidesTest.class, ""), new SlidesTest(slideMotor));
 //        manager.register(metaForClass(PSODirectionDebugger.class, ""), new PSODirectionDebugger(slideMotor, null));
         manager.register(
-                metaForClass(FrictionTest.class, "Arm"), new FrictionTest(slideMotor, angleRange, slideRange)
+                metaForClass(FrictionTest.class, "Arm"), new FrictionTest(slideMotor, angleRange,slideRange)
         );
         manager.register(
                 metaForClass(SampleOpMode.class, "Arm"), new SampleOpMode(slideMotor)

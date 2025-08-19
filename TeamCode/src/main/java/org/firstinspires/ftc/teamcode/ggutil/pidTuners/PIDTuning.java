@@ -5,6 +5,7 @@ import com.dacodingbeast.pidtuners.Constants.PivotSystemConstants;
 import com.dacodingbeast.pidtuners.Constants.SlideSystemConstants;
 import com.dacodingbeast.pidtuners.HardwareSetup.ArmMotor;
 import com.dacodingbeast.pidtuners.HardwareSetup.Hardware;
+import com.dacodingbeast.pidtuners.HardwareSetup.PIDParams;
 import com.dacodingbeast.pidtuners.HardwareSetup.SlideMotor;
 import com.dacodingbeast.pidtuners.Opmodes.FindPID;
 import com.dacodingbeast.pidtuners.Opmodes.FrictionTest;
@@ -22,7 +23,6 @@ import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import org.firstinspires.ftc.robotcore.internal.opmode.OpModeMeta;
 import org.gentrifiedApps.gentrifiedAppsUtil.classes.Scribe;
 
-import CommonUtilities.PIDParams;
 
 public final class PIDTuning {
     public static Double spoolDiameter = 1.5;
